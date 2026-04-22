@@ -40,9 +40,9 @@ def build_registry(
         "ashby": lambda: collect_ashby_jobs(max_boards=None, max_workers=workers),
         "smartrecruiters": lambda: collect_smartrecruiters_jobs(max_workers=workers),
         "workday": lambda: collect_workday_jobs(
-            max_results_per_company=100, max_workers=workers
+            max_results_per_company=None, max_workers=workers
         ),
-        "hiringcafe": lambda: collect_hiringcafe_jobs(max_results=100),
+        "hiringcafe": lambda: collect_hiringcafe_jobs(max_results=None),
     }
 
     for name in enabled:

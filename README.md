@@ -72,33 +72,7 @@ Copy the example profile and customize it:
 cp config/profile.example.toml config/profile.toml
 ```
 
-Edit `config/profile.toml`:
-
-```toml
-[profile]
-name = "Your Name"
-email = "you@example.com"
-location = "City, Country"
-
-[targets]
-titles = ["Senior Software Engineer", "Staff Engineer", "Tech Lead"]
-skills = ["python", "fastapi", "postgresql", "aws", "docker"]
-
-[preferences]
-remote_preference = "remote_only"  # remote_only | remote_preferred | hybrid_ok | any
-minbasesalary_usd = 150000
-
-[sources]
-enable_remotive = true
-enable_hackernews = true
-enable_remoteok = true
-enable_arbeitnow = true
-enable_greenhouse = true
-enable_lever = true
-enable_ashby = true
-enable_workday = false      # slower, use selectively
-enable_smartrecruiters = true
-```
+Edit `config/profile.toml` with your details. See [`config/profile.example.toml`](config/profile.example.toml) for the full template.
 
 ### 2. Search for Jobs
 
@@ -106,28 +80,16 @@ enable_smartrecruiters = true
 # Search all default sources with your profile
 python -m jobforager.cli search --profile config/profile.toml
 
-# Search specific sources with keywords
+# Search specific sources with keywords and export
 python -m jobforager.cli search \
   --sources remotive,greenhouse,lever \
   --keywords "python,senior" \
   --location "remote" \
-  --last 7d
-
-# Search every available source
-python -m jobforager.cli search --sources all
-
-# Export results to JSON
-python -m jobforager.cli search \
-  --sources all \
-  --profile config/profile.toml \
-  --keywords "backend" \
+  --last 7d \
   --output-json results.json
-
-# Export results to CSV
-python -m jobforager.cli search \
-  --sources remotive,remoteok \
-  --output-csv jobs.csv
 ```
+
+See [`docs/CLI_REFERENCE.md`](docs/CLI_REFERENCE.md) for all commands, flags, and examples.
 
 ### 3. Validate Your Profile
 
@@ -151,40 +113,14 @@ See [`docs/CLI_REFERENCE.md`](docs/CLI_REFERENCE.md) for all commands, flags, an
 
 Job Forager uses a TOML profile for personalized filtering. The profile is applied **before** CLI flags, so CLI flags further narrow the results.
 
-### Profile Filtering Logic
+When you provide a profile, jobs are filtered with **AND** logic across:
+- **Remote preference** — `remote_only` excludes non-remote jobs; `remote_preferred` allows hybrid; `any` allows all
+- **Location** — substring match against your specified locations
+- **Title** — substring match against your target titles
+- **Skills** — job must mention at least one of your skills in title, tags, or description
+- **Salary floor** — jobs below your minimum are excluded
 
-When you provide a profile, jobs are filtered with **AND** logic across these dimensions:
-
-1. **Remote preference** — `remote_only` excludes non-remote jobs; `remote_preferred` allows hybrid; `any` allows all
-2. **Location** — Job location must contain at least one of your specified locations (substring match)
-3. **Title** — Job title must contain at least one of your target titles (substring match, case-insensitive)
-4. **Skills** — Job must have at least one of your skills in title, tags, or description
-5. **Salary floor** — Jobs with parsed salary below your minimum are excluded
-
-### Example Profile
-
-```toml
-[profile]
-name = "Jane Doe"
-email = "jane@example.com"
-location = "San Francisco, CA"
-
-[targets]
-titles = ["Software Engineer", "Backend Engineer"]
-skills = ["python", "django", "aws"]
-
-[preferences]
-remote_preference = "remote_preferred"
-minbasesalary_usd = 120000
-
-[sources]
-enable_remotive = true
-enable_hackernews = true
-enable_greenhouse = true
-enable_lever = true
-```
-
-See `config/profile.example.toml` for the complete template.
+See [`config/profile.example.toml`](config/profile.example.toml) for the complete template.
 
 ---
 
@@ -192,8 +128,6 @@ See `config/profile.example.toml` for the complete template.
 
 - [`docs/CLI_REFERENCE.md`](docs/CLI_REFERENCE.md) — Commands, flags, and examples
 - [`docs/API_SOURCES.md`](docs/API_SOURCES.md) — Supported job sources and coverage
-- [`docs/ROADMAP.md`](docs/ROADMAP.md) — Planned features and improvements
-- [`dev-docs/architecture.md`](dev-docs/architecture.md) — Module structure and data flow
 
 ---
 
