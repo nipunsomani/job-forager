@@ -1,0 +1,48 @@
+from __future__ import annotations
+
+from typing import Any
+
+
+def sample_raw_records() -> list[dict[str, Any]]:
+    return [
+        {
+            "source": "remotive",
+            "title": "Senior Software Engineer",
+            "company": "Example Labs",
+            "job_url": "https://jobs.example.com/roles/1",
+            "location": "City, Country",
+            "remote_type": "remote",
+            "salary_raw": "$120k-$150k",
+            "salary_min_usd": 120000,
+            "salary_max_usd": 150000,
+            "apply_url": "https://jobs.example.com/roles/1/apply",
+            "description": "Build APIs and async services.",
+            "tags": ["python", "fastapi"],
+            "metadata": {"seed": "sample"},
+        },
+        {
+            "source": "remotive",
+            "title": "Senior Software Engineer",
+            "company": "Example Labs",
+            "job_url": "https://jobs.example.com/roles/1",
+            "location": "City, Country",
+            "remote_type": "remote",
+            "salary_raw": "$120k-$150k",
+            "salary_min_usd": "120000",
+            "salary_max_usd": "150000",
+            "tags": ["python"],
+            "raw_payload_id": "duplicate-example",
+        },
+        {
+            "source": "themuse",
+            "title": "Senior Software Engineer",
+            "company": "Data Co",
+            "job_url": "https://muse.example/jobs/42",
+            "location": "City, Country",
+            "remote_type": "remote",
+            "external_id": "muse-42",
+            "apply_url": "https://muse.example/jobs/42/apply",
+            "description": "Data platform engineering.",
+            "tags": ["fastapi"],
+        },
+    ]

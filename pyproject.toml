@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "job-forager"
+version = "0.1.0"
+description = "Open-source job hunting CLI with live multi-source aggregation, zero dependencies"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    { name = "Nipun Somani", email = "18125240+nipunsomani@users.noreply.github.com" },
+]
+maintainers = [
+    { name = "Nipun Somani", email = "18125240+nipunsomani@users.noreply.github.com" },
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/nipunsomani/job-forager"
+Repository = "https://github.com/nipunsomani/job-forager"
+Issues = "https://github.com/nipunsomani/job-forager/issues"
+
+[project.scripts]
+job-forager = "jobforager.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

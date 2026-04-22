@@ -1,0 +1,23 @@
+[profile]
+name = "Your Name"
+email = "you@example.com"
+location = "City, Country"
+
+[targets]
+titles = ["Senior Software Engineer", "Staff Engineer", "Tech Lead"]
+skills = ["python", "fastapi", "postgresql", "aws", "docker"]
+
+[preferences]
+remote_preference = "remote_only" # remote_only | remote_preferred | hybrid_ok | any
+minbasesalary_usd = 150000
+
+[sources]
+enable_remotive = true
+enable_hackernews = true
+enable_remoteok = true
+enable_arbeitnow = true
+enable_greenhouse = true
+enable_lever = true
+enable_ashby = true
+enable_workday = false      # slower, use selectively
+enable_smartrecruiters = true

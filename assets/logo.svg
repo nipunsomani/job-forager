@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="wingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f093fb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f5576c;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="240" fill="url(#bgGrad)" filter="url(#shadow)"/>
+
+  <!-- Left wing -->
+  <path d="M 120 200 
+           Q 80 160, 60 180 
+           Q 50 200, 80 220 
+           Q 110 240, 140 230 
+           Q 160 220, 150 200 
+           Q 140 180, 120 200 Z" 
+        fill="url(#wingGrad)" opacity="0.9"/>
+  
+  <path d="M 130 240 
+           Q 90 210, 75 235 
+           Q 70 255, 100 270 
+           Q 130 285, 155 270 
+           Q 170 260, 160 245 
+           Q 150 230, 130 240 Z" 
+        fill="url(#wingGrad)" opacity="0.8"/>
+
+  <!-- Right wing (mirrored) -->
+  <path d="M 392 200 
+           Q 432 160, 452 180 
+           Q 462 200, 432 220 
+           Q 402 240, 372 230 
+           Q 352 220, 362 200 
+           Q 372 180, 392 200 Z" 
+        fill="url(#wingGrad)" opacity="0.9"/>
+  
+  <path d="M 382 240 
+           Q 422 210, 437 235 
+           Q 442 255, 412 270 
+           Q 382 285, 357 270 
+           Q 342 260, 352 245 
+           Q 362 230, 382 240 Z" 
+        fill="url(#wingGrad)" opacity="0.8"/>
+
+  <!-- Magnifying glass circle -->
+  <circle cx="256" cy="240" r="85" fill="none" stroke="#ffffff" stroke-width="20" opacity="0.95"/>
+  
+  <!-- Magnifying glass handle -->
+  <line x1="316" y1="300" x2="370" y2="360" stroke="#ffffff" stroke-width="24" stroke-linecap="round" opacity="0.95"/>
+  
+  <!-- Inner search icon (magnifying glass detail) -->
+  <circle cx="256" cy="240" r="55" fill="none" stroke="#ffffff" stroke-width="6" opacity="0.4"/>
+  
+  <!-- Small sparkle/dot inside -->
+  <circle cx="290" cy="205" r="8" fill="#ffffff" opacity="0.9"/>
+
+  <!-- Text at bottom -->
+  <text x="256" y="440" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="48" font-weight="700" fill="#ffffff" letter-spacing="2">JF</text>
+</svg>

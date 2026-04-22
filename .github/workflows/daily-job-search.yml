@@ -1,0 +1,44 @@
+name: Daily Job Search
+
+on:
+  schedule:
+    # Run daily at 08:00 UTC
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+
+jobs:
+  search:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install optional dependencies
+        run: |
+          pip install playwright || true
+          playwright install chromium || true
+
+      - name: Run job search
+        env:
+          PYTHONPATH: src
+        run: |
+          python -m jobforager.cli search \
+            --sources all \
+            --profile config/profile.example.toml \
+            --last 24h \
+            --output-json jobs.json \
+            --output-csv jobs.csv
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: job-search-results-${{ github.run_id }}
+          path: |
+            jobs.json
+            jobs.csv
+          retention-days: 7
