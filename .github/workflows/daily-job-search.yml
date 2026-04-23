@@ -2,7 +2,6 @@ name: Daily Job Search
 
 on:
   schedule:
-    # Run daily at 01:00 UTC (02:00 BST summer / 01:00 GMT winter)
     - cron: "0 1 * * *"
   workflow_dispatch:
 
@@ -18,12 +17,18 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Restore job database cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/jobforager
+          key: jobdb-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: jobdb-${{ runner.os }}-
+
       - name: Install optional dependencies
         run: |
-          pip install playwright || true
-          playwright install chromium || true
+          pip install python-jobspy || true
 
-      - name: Run job search
+      - name: Run incremental job search
         env:
           PYTHONPATH: src
         run: |
@@ -32,14 +37,12 @@ jobs:
             --title-keywords "Application Security,Application Security Engineer,Security,Security Engineer,Pentest,Penetration Test,Penetration Tester,Penetration Testing Engineer,Offensive Security,Offensive Security Engineer,Offsec,Offsec Engineer,Product Security,Product Security Engineer" \
             --location "UK, London" \
             --last 15d \
-            --output-json jobs.json \
-            --output-csv jobs.csv
+            --since-last-run \
+            --output-json new_jobs.json
 
-      - name: Upload results
+      - name: Upload new jobs
         uses: actions/upload-artifact@v4
         with:
-          name: job-search-results-${{ github.run_id }}
-          path: |
-            jobs.json
-            jobs.csv
+          name: new-jobs-${{ github.run_id }}
+          path: new_jobs.json
           retention-days: 7
