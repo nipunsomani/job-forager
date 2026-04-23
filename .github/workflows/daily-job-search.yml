@@ -2,8 +2,8 @@ name: Daily Job Search
 
 on:
   schedule:
-    # Run daily at 08:00 UTC
-    - cron: "0 8 * * *"
+    # Run daily at 01:00 UTC (02:00 BST summer / 01:00 GMT winter)
+    - cron: "0 1 * * *"
   workflow_dispatch:
 
 jobs:
@@ -29,8 +29,8 @@ jobs:
         run: |
           python -m jobforager.cli search \
             --sources all \
-            --profile config/profile.example.toml \
-            --last 24h \
+            --keywords "Application Security,Application Security Engineer,Security,Security Engineer,Pentest,Penetration Test,Penetration Tester,Penetration Testing Engineer,Offensive Security,Offensive Security Engineer,Offsec,Offsec Engineer,Product Security,Product Security Engineer" \
+            --last 15d \
             --output-json jobs.json \
             --output-csv jobs.csv
 
