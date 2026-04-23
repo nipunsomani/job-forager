@@ -211,7 +211,24 @@ def _run_search_command(args: argparse.Namespace) -> int:
             print("search error: --last must be like 24h, 7d, 30d.")
             return 1
 
+    _ALL_SOURCES = [
+        "remotive", "hackernews", "remoteok", "arbeitnow",
+        "greenhouse", "lever", "ashby", "smartrecruiters",
+        "workday", "hiringcafe",
+    ]
+
     source_names = [s.strip() for s in args.sources.split(",") if s.strip()]
+    if source_names == ["all"]:
+        source_names = _ALL_SOURCES[:]
+    elif profile is not None and args.sources == "remotive,hackernews":
+        # Default sources not overridden; use profile toggles
+        toggled = [
+            name for name in _ALL_SOURCES
+            if profile.source_toggles.get(f"enable_{name}", True)
+        ]
+        if toggled:
+            source_names = toggled
+
     workers = max(1, args.workers)
 
     result = run_search_pipeline(
