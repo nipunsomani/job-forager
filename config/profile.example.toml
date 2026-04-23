@@ -21,3 +21,6 @@ enable_lever = true
 enable_ashby = true
 enable_workday = false      # slower, use selectively
 enable_smartrecruiters = true
+enable_linkedin = true
+enable_indeed = true
+enable_glassdoor = true

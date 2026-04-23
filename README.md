@@ -14,11 +14,11 @@
 
 ## What This Project Does
 
-Job Forager is a Python CLI tool that aggregates live job listings from **10 different sources** covering thousands of companies. It normalizes, deduplicates, filters, and ranks jobs against your candidate profile — giving you a curated list of real opportunities with direct apply links.
+Job Forager is a Python CLI tool that aggregates live job listings from **13 different sources** covering thousands of companies. It normalizes, deduplicates, filters, and ranks jobs against your candidate profile — giving you a curated list of real opportunities with direct apply links.
 
 ### Key Capabilities
 
-- **Multi-source job discovery** — Fetch live jobs from Remotive, Hacker News, RemoteOK, ArbeitNow, Greenhouse, Lever, Ashby, Workday, SmartRecruiters, and Hiring.cafe
+- **Multi-source job discovery** — Fetch live jobs from Remotive, Hacker News, RemoteOK, ArbeitNow, Greenhouse, Lever, Ashby, Workday, SmartRecruiters, Hiring.cafe, LinkedIn, Indeed, and Glassdoor
 - **Maximum coverage, no limits** — Every company endpoint and every pagination page is fetched. Greenhouse: 8,032 boards. Lever: 4,368 companies. Ashby: 2,796 boards. All concurrently.
 - **Concurrent fetching** — ThreadPoolExecutor with configurable workers (`--workers 30`). 100 boards in ~2 seconds.
 - **Company list expansion** — Automatically discovers thousands of companies from public GitHub repositories (Feashliaa, stapply-ai). Fresh data on every run, no caching.
@@ -28,7 +28,7 @@ Job Forager is a Python CLI tool that aggregates live job listings from **10 dif
 - **Advanced CLI filters** — `--exclude`, `--level` (intern/entry/mid/senior), `--hide-recruiters`
 - **URL validation** — Checks job URLs for 404s and availability
 - **Export** — Output results as JSON or CSV
-- **Zero external dependencies** — Uses only Python standard library (`urllib`, `dataclasses`, `argparse`, etc.)
+- **Zero external dependencies (core)** — Uses only Python standard library (`urllib`, `dataclasses`, `argparse`, etc.). Optional `python-jobspy` package unlocks LinkedIn, Indeed, and Glassdoor scraping.
 
 ---
 

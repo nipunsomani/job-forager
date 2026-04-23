@@ -86,7 +86,7 @@ python -m jobforager.cli search \
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--sources` | `remotive,hackernews` | Comma-separated source list. Available: `remotive`, `hackernews`, `remoteok`, `arbeitnow`, `greenhouse`, `lever`, `ashby`, `workday`, `smartrecruiters`, `hiringcafe` |
+| `--sources` | `remotive,hackernews` | Comma-separated source list. Available: `remotive`, `hackernews`, `remoteok`, `arbeitnow`, `greenhouse`, `lever`, `ashby`, `workday`, `smartrecruiters`, `hiringcafe`, `linkedin`, `indeed`, `glassdoor` |
 | `--keywords` | (none) | Comma-separated keywords to match in title, company, tags, or description |
 | `--exclude` | (none) | Comma-separated keywords to EXCLUDE from results |
 | `--location` | (none) | Free-text location filter (substring match) |
@@ -109,15 +109,27 @@ python -m jobforager.cli search \
 - **`hiringcafe`**: 2.1M+ job index, 1,000 jobs per page, **all pages fetched**. Falls back through urllib → curl_cffi → Playwright for Cloudflare bypass.
 - **`remotive`, `remoteok`, `arbeitnow`**: Single API call, all jobs returned.
 - **`hackernews`**: Top 50 comments from current month's thread.
+- **`linkedin`, `indeed`, `glassdoor`**: Scraped via **JobSpy** (optional dependency). Install with `pip install python-jobspy`. Results capped at 50 per site by default (last 7 days). `--keywords` and `--title-keywords` are forwarded to the scraper as the search term.
 
 ### Example: Search All Sources
 
 ```bash
 python -m jobforager.cli search \
-  --sources remotive,hackernews,remoteok,arbeitnow,greenhouse,lever,ashby,smartrecruiters \
+  --sources all \
   --keywords "python" \
   --last 7d \
   --output-json all_sources.json
+```
+
+### Example: Search JobSpy Sources (LinkedIn + Indeed + Glassdoor)
+
+```bash
+pip install python-jobspy
+python -m jobforager.cli search \
+  --sources linkedin,indeed,glassdoor \
+  --keywords "software engineer" \
+  --location "London,UK" \
+  --output-json jobspy_results.json
 ```
 
 ### Example: Search ATS Platforms Only

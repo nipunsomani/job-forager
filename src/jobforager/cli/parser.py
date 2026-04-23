@@ -59,7 +59,8 @@ def build_parser() -> argparse.ArgumentParser:
         "search",
         help=(
             "Search live job sources (remotive, hackernews, remoteok, "
-            "arbeitnow, greenhouse, lever, ashby, smartrecruiters, workday, hiringcafe)."
+            "arbeitnow, greenhouse, lever, ashby, smartrecruiters, workday, "
+            "hiringcafe, linkedin, indeed, glassdoor)."
         ),
     )
     search_parser.add_argument(
@@ -116,7 +117,8 @@ def build_parser() -> argparse.ArgumentParser:
         help=(
             "Comma-separated source list. Available: remotive, hackernews, "
             "remoteok, arbeitnow, greenhouse, lever, ashby, smartrecruiters, "
-            "workday, hiringcafe. (default: remotive,hackernews)."
+            "workday, hiringcafe, linkedin, indeed, glassdoor. "
+            "(default: remotive,hackernews)."
         ),
     )
     search_parser.add_argument(

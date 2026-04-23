@@ -16,6 +16,9 @@ This document describes every job source collector in detail: the API endpoint, 
 | **Workday** | **All companies** (live list) | 20 jobs per page, **all pages** | Up to 2,000 per company (API hard limit) |
 | **SmartRecruiters** | **All slugs** (live list) | 100 jobs per page, **all pages** | All jobs per slug |
 | **Hiring.cafe** | 1 API query | 1,000 jobs per page, **all pages** | All matching jobs |
+| **LinkedIn** | JobSpy scraper | Page-scrolled scraping | Up to 50 per query (configurable) |
+| **Indeed** | JobSpy scraper | Page-scrolled scraping | Up to 50 per query (configurable) |
+| **Glassdoor** | JobSpy scraper | Page-scrolled scraping | Up to 50 per query (configurable) |
 
 All multi-endpoint sources use **ThreadPoolExecutor** for concurrent fetching. Default: 30 workers.
 
@@ -687,6 +690,96 @@ None. No API key required.
 
 ---
 
+## LinkedIn (via JobSpy)
+
+**Module**: `search/jobspy_source.py`  
+**Function**: `collect_linkedin_jobs(search_term, location, results_wanted, hours_old)`
+
+### API Approach
+**Scraper-based** — JobSpy uses headless-browser-style requests to scrape LinkedIn job search results. No official public API.
+
+### Authentication
+None. No API key required.
+
+### Parameters
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `search_term` | (from `--keywords` or `--title-keywords`) | Keywords sent to LinkedIn search |
+| `location` | (from `--location`) | Geographic location filter |
+| `results_wanted` | `50` | Max results to fetch |
+| `hours_old` | `168` | Only jobs posted within last N hours |
+
+### Response Format
+JobSpy returns a pandas DataFrame. Fields mapped to JobRecord:
+
+| Raw Field | JobRecord Field |
+|-----------|-----------------|
+| `title` | `title` |
+| `company` | `company` |
+| `job_url` | `job_url`, `apply_url` |
+| `location` | `location` |
+| `description` | `description` |
+| `date_posted` | `posted_at` |
+| `is_remote` | `remote_type` (`remote` or `onsite`) |
+| `min_amount` / `max_amount` / `currency` | `salary_raw`, `salary_min_usd`, `salary_max_usd` |
+| `id` | `external_id` |
+
+### Coverage
+- **Endpoints**: LinkedIn `/jobs-guest/jobs/api/jsee...` internal endpoint
+- **Pagination**: Scrolled pagination inside JobSpy
+- **Jobs fetched**: Up to `results_wanted` per query (default 50)
+
+### Notes
+- **Optional dependency**: Requires `pip install python-jobspy`. If not installed, collector returns `[]` silently.
+- `--keywords`, `--title-keywords`, and `--desc-keywords` are combined into `search_term` for the scraper. Local title/description filters still apply after fetch.
+- LinkedIn rate-limits aggressively; results may vary by IP.
+
+---
+
+## Indeed (via JobSpy)
+
+**Module**: `search/jobspy_source.py`  
+**Function**: `collect_indeed_jobs(search_term, location, results_wanted, hours_old)`
+
+### API Approach
+**Scraper-based** — JobSpy scrapes Indeed search results HTML.
+
+### Parameters
+Same interface as LinkedIn above.
+
+### Coverage
+- **Endpoints**: Indeed search results pages
+- **Pagination**: Scrolled pagination inside JobSpy
+- **Jobs fetched**: Up to `results_wanted` per query (default 50)
+
+### Notes
+- **Optional dependency**: Requires `pip install python-jobspy`.
+- Generally more stable than LinkedIn scraping.
+
+---
+
+## Glassdoor (via JobSpy)
+
+**Module**: `search/jobspy_source.py`  
+**Function**: `collect_glassdoor_jobs(search_term, location, results_wanted, hours_old)`
+
+### API Approach
+**Scraper-based** — JobSpy scrapes Glassdoor job search results.
+
+### Parameters
+Same interface as LinkedIn above.
+
+### Coverage
+- **Endpoints**: Glassdoor search results pages
+- **Pagination**: Scrolled pagination inside JobSpy
+- **Jobs fetched**: Up to `results_wanted` per query (default 50)
+
+### Notes
+- **Optional dependency**: Requires `pip install python-jobspy`.
+- Subject to Cloudflare WAF blocks; may return empty results on some IPs.
+
+---
+
 ## Rate Limiting & Concurrency
 
 | Source | Concurrency | Delay | Workers |
@@ -701,10 +794,14 @@ None. No API key required.
 | **Workday** | **Parallel** (ThreadPoolExecutor) | 0.5s | **10** |
 | **SmartRecruiters** | **Parallel** (ThreadPoolExecutor) | None | **10** |
 | Hiring.cafe | Sequential pages | None | N/A |
+| LinkedIn | Internal (JobSpy) | None | N/A |
+| Indeed | Internal (JobSpy) | None | N/A |
+| Glassdoor | Internal (JobSpy) | None | N/A |
 
 ### General Guidelines
 - **No artificial limits**: All multi-endpoint sources explore every available company/board/slug
 - **Concurrent fetching**: Greenhouse, Lever, Ashby, Workday, and SmartRecruiters use `ThreadPoolExecutor` for parallel requests
-- **CLI `--workers` flag**: Controls concurrency (default: 30)
+- **CLI `--workers` flag**: Controls concurrency for multi-company sources (default: 30)
 - All collectors gracefully handle network errors and return `[]`
 - Company lists are fetched live from GitHub on every run (no caching)
+- JobSpy sources (LinkedIn, Indeed, Glassdoor) are **optional** — install with `pip install python-jobspy`

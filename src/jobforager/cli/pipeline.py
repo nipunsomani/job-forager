@@ -14,6 +14,11 @@ from jobforager.search.arbeitnow import collect_arbeitnow_jobs
 from jobforager.search.greenhouse import collect_greenhouse_jobs
 from jobforager.search.hackernews import collect_hackernews_jobs
 from jobforager.search.hiringcafe import collect_hiringcafe_jobs
+from jobforager.search.jobspy_source import (
+    collect_glassdoor_jobs,
+    collect_indeed_jobs,
+    collect_linkedin_jobs,
+)
 from jobforager.search.lever import collect_lever_jobs
 from jobforager.search.remoteok import collect_remoteok_jobs
 from jobforager.search.remotive import collect_remotive_jobs
@@ -25,7 +30,10 @@ logger = logging.getLogger("jobforager.pipeline")
 
 
 def build_registry(
-    source_names: list[str], workers: int
+    source_names: list[str],
+    workers: int,
+    search_term: str | None = None,
+    location_query: str | None = None,
 ) -> tuple[CollectorRegistry, dict[str, bool]]:
     registry = CollectorRegistry()
     enabled: dict[str, bool] = {name: True for name in source_names}
@@ -43,6 +51,15 @@ def build_registry(
             max_results_per_company=None, max_workers=workers
         ),
         "hiringcafe": lambda: collect_hiringcafe_jobs(max_results=None),
+        "linkedin": lambda: collect_linkedin_jobs(
+            search_term=search_term, location=location_query
+        ),
+        "indeed": lambda: collect_indeed_jobs(
+            search_term=search_term, location=location_query
+        ),
+        "glassdoor": lambda: collect_glassdoor_jobs(
+            search_term=search_term, location=location_query
+        ),
     }
 
     for name in enabled:
@@ -110,7 +127,15 @@ def run_search_pipeline(
     title_keywords: list[str] | None = None,
     desc_keywords: list[str] | None = None,
 ) -> dict[str, Any]:
-    registry, enabled = build_registry(source_names, workers)
+    search_term = " ".join(keywords) if keywords else None
+    if search_term is None and title_keywords:
+        search_term = " ".join(title_keywords)
+    if search_term is None and desc_keywords:
+        search_term = " ".join(desc_keywords)
+
+    registry, enabled = build_registry(
+        source_names, workers, search_term=search_term, location_query=location_query
+    )
     errors: dict[str, str] = {}
     raw_records = registry.collect_concurrent(
         enabled, errors=errors, max_workers=workers
