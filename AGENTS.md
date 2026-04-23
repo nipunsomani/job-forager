@@ -44,6 +44,7 @@ PYTHONPATH=src python -m unittest tests.test_search_remotive -v
 - `src/jobforager/collectors/` — `CollectorRegistry` (sequential + `ThreadPoolExecutor` concurrent collection).
 - `src/jobforager/exporters/` — JSON and CSV writers.
 - `src/jobforager/config/` — TOML profile loader.
+- `src/jobforager/storage/` — SQLite-backed `JobStore` for incremental discovery and job persistence across runs.
 
 ## Key conventions
 
@@ -56,10 +57,12 @@ PYTHONPATH=src python -m unittest tests.test_search_remotive -v
 - `hunt` only supports `--dry-run` (Phase 1.2 scaffolding).
 - `search` hits live APIs. Default sources: `remotive,hackernews`. Use `--sources all` for all 13.
 - `search --workers 30` is the default concurrency level for multi-company sources.
+- `search --since-last-run` outputs only jobs discovered since the previous run (uses SQLite DB at `~/.cache/jobforager/jobs.db` or custom `--db-path`).
 - Workday is slow; profile example disables it by default (`enable_workday = false`).
 - Company lists are fetched dynamically from public GitHub repos on every run (no local cache).
 - Profile path defaults to `config/profile.example.toml` for `hunt`/`validate`; `search` has no default profile.
 - Optional JobSpy sources (`linkedin`, `indeed`, `glassdoor`) require `pip install python-jobspy`.
+- Default DB location: `~/.cache/jobforager/jobs.db` (Linux/macOS) or `%LOCALAPPDATA%\jobforager\jobs.db` (Windows).
 
 ## Known limitations
 
@@ -71,4 +74,4 @@ Hiring.cafe is protected by Cloudflare. GitHub Actions runners use Azure/datacen
 ## GitHub Actions
 
 - `.github/workflows/ci.yml` — runs on push/PR to `main`, matrix Python 3.10–3.13.
-- `.github/workflows/daily-job-search.yml` — scheduled at 01:00 UTC, optionally installs Playwright, uploads JSON/CSV artifacts.
+- `.github/workflows/daily-job-search.yml` — scheduled at 01:00 UTC. Uses `actions/cache` to persist the job database between runs for incremental discovery. Outputs only new jobs via `--since-last-run`.

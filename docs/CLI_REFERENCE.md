@@ -98,6 +98,8 @@ python -m jobforager.cli search \
 | `--profile` | (none) | Path to profile TOML for additional filtering |
 | `--output-json` | (none) | Path to write normalized records as JSON |
 | `--output-csv` | (none) | Path to write normalized records as CSV |
+| `--db-path` | (none) | Path to SQLite database for incremental job tracking |
+| `--since-last-run` | (none) | Only show jobs discovered since the last run (uses `--db-path` or default cache location) |
 
 ### Source-Specific Notes
 
@@ -149,6 +151,35 @@ python -m jobforager.cli search \
   --sources remotive,remoteok,arbeitnow \
   --location "remote" \
   --last 24h
+```
+
+### Example: Incremental Search (Only New Jobs)
+
+```bash
+# First run: fetches all jobs and stores them in the default cache DB
+python -m jobforager.cli search \
+  --sources all \
+  --keywords "python" \
+  --output-json jobs.json
+
+# Subsequent run: only outputs jobs not seen in previous runs
+python -m jobforager.cli search \
+  --sources all \
+  --keywords "python" \
+  --since-last-run \
+  --output-json new_jobs.json
+```
+
+### Incremental Search with Custom DB Path
+
+```bash
+python -m jobforager.cli search \
+  --sources all \
+  --title-keywords "Security Engineer" \
+  --location "London,UK" \
+  --db-path ./my_jobs.db \
+  --since-last-run \
+  --output-json new_jobs.json
 ```
 
 ### Example Output

@@ -28,7 +28,9 @@ Job Forager is a Python CLI tool that aggregates live job listings from **13 dif
 - **Advanced CLI filters** — `--exclude`, `--level` (intern/entry/mid/senior), `--hide-recruiters`
 - **URL validation** — Checks job URLs for 404s and availability
 - **Export** — Output results as JSON or CSV
-- **Zero external dependencies (core)** — Uses only Python standard library (`urllib`, `dataclasses`, `argparse`, etc.). Optional `python-jobspy` package unlocks LinkedIn, Indeed, and Glassdoor scraping.
+- **Zero external dependencies (core)** — Uses only Python standard library (`urllib`, `dataclasses`, `argparse`, `sqlite3`, etc.). Optional `python-jobspy` package unlocks LinkedIn, Indeed, and Glassdoor scraping.
+- **Incremental discovery** — SQLite-backed job tracking. Run once to build the database, then use `--since-last-run` to output only jobs discovered since the previous execution. Perfect for scheduled CI runs.
+- **CI-optimized** — Designed for GitHub Actions with built-in caching support. No Docker, no server, no hosting required.
 
 ---
 
@@ -150,16 +152,27 @@ You can run Job Forager on a schedule using GitHub Actions. A workflow file is i
 ### Setup
 
 1. Fork this repository
-2. Add your `profile.toml` as a repository secret (or commit it if it contains no sensitive data)
-3. Enable GitHub Actions in your fork
-4. The workflow runs daily at 08:00 UTC and can also be triggered manually
+2. Enable GitHub Actions in your fork ( Actions tab → "I understand my workflows, go ahead and enable them")
+3. The workflow runs daily at 01:00 UTC and can also be triggered manually
+
+### How Incremental Search Works in CI
+
+The workflow uses `actions/cache` to persist the job database between runs:
+
+```
+Day 1: No cache → fetches all jobs → saves DB to cache
+Day 2: Restores DB → fetches jobs → outputs only new ones → updates cache
+```
+
+This means your daily artifact (`new_jobs.json`) contains only jobs discovered since yesterday, not the entire internet.
 
 ### Workflow Features
 
-- Runs on Ubuntu latest with Python 3.10+
-- Caches job results as workflow artifacts
-- Supports JSON and CSV output upload
+- Runs on Ubuntu latest with Python 3.12
+- Restores job database from cache between runs (incremental discovery)
+- Supports JSON output upload as artifact
 - Configurable schedule via cron expression
+- No profile required — keywords and filters are inline in the workflow
 
 ### Manual Trigger
 
