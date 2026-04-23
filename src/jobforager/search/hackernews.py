@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 """Hacker News "Who's Hiring" collector via Firebase API."""
 
 import calendar
+import concurrent.futures
 import html
 import json
 import re
@@ -165,6 +168,7 @@ def collect_hackernews_jobs(
     month: int | None = None,
     max_comments: int = 50,
     delay: float = 0.5,
+    max_workers: int = 1,
 ) -> list[dict[str, Any]]:
     """Collect job postings from the HN "Who's Hiring?" thread."""
     if year is None or month is None:
@@ -186,13 +190,31 @@ def collect_hackernews_jobs(
             return []
 
         results: list[dict[str, Any]] = []
-        for kid_id in kids[:max_comments]:
-            comment = fetch_hn_item(kid_id)
-            if comment is not None:
-                parsed = parse_hn_job_comment(comment)
-                if parsed is not None:
-                    results.append(parsed)
-            time.sleep(delay)
+        target_kids = kids[:max_comments]
+
+        if max_workers <= 1:
+            for kid_id in target_kids:
+                comment = fetch_hn_item(kid_id)
+                if comment is not None:
+                    parsed = parse_hn_job_comment(comment)
+                    if parsed is not None:
+                        results.append(parsed)
+                time.sleep(delay)
+        else:
+            with concurrent.futures.ThreadPoolExecutor(
+                max_workers=max_workers
+            ) as executor:
+                future_to_kid: dict[concurrent.futures.Future, int] = {}
+                for kid_id in target_kids:
+                    future = executor.submit(fetch_hn_item, kid_id)
+                    future_to_kid[future] = kid_id
+                    time.sleep(0.05)
+                for future in concurrent.futures.as_completed(future_to_kid):
+                    comment = future.result()
+                    if comment is not None:
+                        parsed = parse_hn_job_comment(comment)
+                        if parsed is not None:
+                            results.append(parsed)
 
         return results
     except Exception:

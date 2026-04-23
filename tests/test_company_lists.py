@@ -8,6 +8,7 @@ from jobforager.company_lists import (
     get_ashby_boards,
     get_greenhouse_tokens,
     get_lever_slugs,
+    get_smartrecruiters_slugs,
 )
 
 
@@ -36,6 +37,12 @@ class TestExtractSlugFromUrl(unittest.TestCase):
             "supabase",
         )
 
+    def test_smartrecruiters(self) -> None:
+        self.assertEqual(
+            _extract_slug_from_url("https://jobs.smartrecruiters.com/adobe1"),
+            "adobe1",
+        )
+
     def test_unknown(self) -> None:
         self.assertIsNone(
             _extract_slug_from_url("https://example.com/jobs"),
@@ -53,18 +60,33 @@ class TestGetGreenhouseTokens(unittest.TestCase):
         with patch(
             "jobforager.company_lists._fetch_json",
             side_effect=IOError("network down"),
+        ), patch(
+            "jobforager.company_lists._load_local_json",
+            return_value=None,
         ):
             tokens = get_greenhouse_tokens()
         self.assertIsInstance(tokens, list)
         self.assertIn("airbnb", tokens)
 
-    def test_returns_fetched_data(self) -> None:
+    def test_returns_merged_defaults_and_fetched(self) -> None:
         with patch(
             "jobforager.company_lists._fetch_json",
             return_value=["stripe", "figma", "anthropic"],
-        ):
+        ), patch(
+            "jobforager.company_lists._load_local_json",
+            return_value=None,
+        ), patch(
+            "jobforager.company_lists._save_local_json",
+        ) as mock_save:
             tokens = get_greenhouse_tokens()
-        self.assertEqual(tokens, ["stripe", "figma", "anthropic"])
+        expected = sorted(
+            set(
+                ["airbnb", "stripe", "figma", "anthropic", "hootsuite", "canonical"]
+                + ["stripe", "figma", "anthropic"]
+            )
+        )
+        self.assertEqual(tokens, expected)
+        mock_save.assert_called_once()
 
 
 class TestGetLeverSlugs(unittest.TestCase):
@@ -72,18 +94,33 @@ class TestGetLeverSlugs(unittest.TestCase):
         with patch(
             "jobforager.company_lists._fetch_json",
             side_effect=IOError("network down"),
+        ), patch(
+            "jobforager.company_lists._load_local_json",
+            return_value=None,
         ):
             slugs = get_lever_slugs()
         self.assertIsInstance(slugs, list)
         self.assertIn("airbnb", slugs)
 
-    def test_returns_fetched_data(self) -> None:
+    def test_returns_merged_defaults_and_fetched(self) -> None:
         with patch(
             "jobforager.company_lists._fetch_json",
             return_value=["netflix", "shopify"],
-        ):
+        ), patch(
+            "jobforager.company_lists._load_local_json",
+            return_value=None,
+        ), patch(
+            "jobforager.company_lists._save_local_json",
+        ) as mock_save:
             slugs = get_lever_slugs()
-        self.assertEqual(slugs, ["netflix", "shopify"])
+        expected = sorted(
+            set(
+                ["airbnb", "netflix", "shopify", "leverdemo"]
+                + ["netflix", "shopify"]
+            )
+        )
+        self.assertEqual(slugs, expected)
+        mock_save.assert_called_once()
 
 
 class TestGetAshbyBoards(unittest.TestCase):
@@ -91,18 +128,67 @@ class TestGetAshbyBoards(unittest.TestCase):
         with patch(
             "jobforager.company_lists._fetch_json",
             side_effect=IOError("network down"),
+        ), patch(
+            "jobforager.company_lists._load_local_json",
+            return_value=None,
         ):
             boards = get_ashby_boards()
         self.assertIsInstance(boards, list)
         self.assertIn("supabase", boards)
 
-    def test_returns_fetched_data(self) -> None:
+    def test_returns_merged_defaults_and_fetched(self) -> None:
         with patch(
             "jobforager.company_lists._fetch_json",
             return_value=["ramp", "linear"],
-        ):
+        ), patch(
+            "jobforager.company_lists._load_local_json",
+            return_value=None,
+        ), patch(
+            "jobforager.company_lists._save_local_json",
+        ) as mock_save:
             boards = get_ashby_boards()
-        self.assertEqual(boards, ["ramp", "linear"])
+        expected = sorted(
+            set(
+                ["supabase", "ramp", "figma", "linear", "vercel", "openai"]
+                + ["ramp", "linear"]
+            )
+        )
+        self.assertEqual(boards, expected)
+        mock_save.assert_called_once()
+
+
+class TestGetSmartrecruitersSlugs(unittest.TestCase):
+    def test_returns_defaults_when_fetch_fails(self) -> None:
+        with patch(
+            "jobforager.company_lists._load_csv_slugs",
+            return_value=None,
+        ), patch(
+            "jobforager.company_lists._load_local_json",
+            return_value=None,
+        ):
+            slugs = get_smartrecruiters_slugs()
+        self.assertIsInstance(slugs, list)
+        self.assertIn("adobe1", slugs)
+
+    def test_returns_merged_defaults_and_fetched(self) -> None:
+        with patch(
+            "jobforager.company_lists._load_csv_slugs",
+            return_value=["canva", "deloitte6"],
+        ), patch(
+            "jobforager.company_lists._load_local_json",
+            return_value=None,
+        ), patch(
+            "jobforager.company_lists._save_local_json",
+        ) as mock_save:
+            slugs = get_smartrecruiters_slugs()
+        expected = sorted(
+            set(
+                ["adobe1", "canva", "deloitte6", "experian", "samsung1"]
+                + ["canva", "deloitte6"]
+            )
+        )
+        self.assertEqual(slugs, expected)
+        mock_save.assert_called_once()
 
 
 if __name__ == "__main__":

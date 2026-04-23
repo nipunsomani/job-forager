@@ -1,11 +1,13 @@
 """Hiring.cafe API collector for job listings.
 
 Falls back through three transport layers:
-1. Standard urllib (fastest, works if no bot protection)
-2. curl_cffi with TLS fingerprint spoofing (bypasses some WAFs)
-3. Playwright browser automation (bypasses Cloudflare JS challenge
-   when the user's IP reputation allows it)
+1. curl_cffi with TLS fingerprint spoofing (best lightweight bypass)
+2. Standard urllib (fastest, works if no bot protection)
+3. Playwright browser automation (last-resort heavy bypass for
+   Cloudflare JS challenge when the user's IP reputation allows it)
 """
+
+from __future__ import annotations
 
 import json
 import ssl
@@ -158,32 +160,60 @@ def _fetch_with_playwright(url: str, payload: dict[str, Any]) -> dict[str, Any] 
     return None
 
 
-def _fetch_total_count(search_state: dict[str, Any]) -> int:
-    payload_dict = {"searchState": search_state}
-    payload = json.dumps(payload_dict).encode("utf-8")
-    req = urllib.request.Request(
-        _COUNT_URL, data=payload, headers=_DEFAULT_HEADERS, method="POST"
-    )
+def _fetch_with_best_transport(
+    url: str, payload_bytes: bytes, payload_dict: dict[str, Any]
+) -> dict[str, Any] | None:
+    """Try curl_cffi first, then urllib, then Playwright.
 
+    Returns the parsed JSON dict on success, or None if every
+    available transport fails.
+    """
+    # 1. curl_cffi — best lightweight bypass
+    data = _fetch_with_curl_cffi(url, payload_bytes)
+    if data is not None:
+        return data
+
+    # 2. urllib — fastest when there is no bot protection
+    req = urllib.request.Request(
+        url, data=payload_bytes, headers=_DEFAULT_HEADERS, method="POST"
+    )
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
 
     try:
         with urllib.request.urlopen(req, context=ctx, timeout=30) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            return data.get("total", 0)
+            return json.loads(resp.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
         if exc.code == 403:
-            data = _fetch_with_curl_cffi(_COUNT_URL, payload)
+            # 3. Playwright — last-resort heavy bypass
+            data = _fetch_with_playwright(url, payload_dict)
             if data is not None:
-                return data.get("total", 0)
-            data = _fetch_with_playwright(_COUNT_URL, payload_dict)
-            if data is not None:
-                return data.get("total", 0)
-        return 0
+                return data
+        return None
     except Exception:
+        pass
+
+    # 3. Playwright for non-HTTPError failures too
+    data = _fetch_with_playwright(url, payload_dict)
+    if data is not None:
+        return data
+
+    print(
+        "[hiringcafe] WARNING: HiringCafe is blocked (Cloudflare/403). "
+        "Consider installing curl_cffi (`pip install curl_cffi`) or "
+        "playwright (`pip install playwright`) for bypass."
+    )
+    return None
+
+
+def _fetch_total_count(search_state: dict[str, Any]) -> int:
+    payload_dict = {"searchState": search_state}
+    payload = json.dumps(payload_dict).encode("utf-8")
+    data = _fetch_with_best_transport(_COUNT_URL, payload, payload_dict)
+    if data is None:
         return 0
+    return data.get("total", 0)
 
 
 def _fetch_jobs_page(
@@ -191,29 +221,10 @@ def _fetch_jobs_page(
 ) -> list[dict[str, Any]]:
     payload_dict = {"size": _PAGE_SIZE, "page": page, "searchState": search_state}
     payload = json.dumps(payload_dict).encode("utf-8")
-    req = urllib.request.Request(
-        _JOBS_URL, data=payload, headers=_DEFAULT_HEADERS, method="POST"
-    )
-
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
-
-    try:
-        with urllib.request.urlopen(req, context=ctx, timeout=30) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            return data.get("results", [])
-    except urllib.error.HTTPError as exc:
-        if exc.code == 403:
-            data = _fetch_with_curl_cffi(_JOBS_URL, payload)
-            if data is not None:
-                return data.get("results", [])
-            data = _fetch_with_playwright(_JOBS_URL, payload_dict)
-            if data is not None:
-                return data.get("results", [])
+    data = _fetch_with_best_transport(_JOBS_URL, payload, payload_dict)
+    if data is None:
         return []
-    except Exception:
-        return []
+    return data.get("results", [])
 
 
 def _strip_html(html: str) -> str:
