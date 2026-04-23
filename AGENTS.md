@@ -2,6 +2,12 @@
 
 Python 3.10+ CLI that aggregates live job listings from 13 sources. Zero core dependencies (stdlib only).
 
+## Project Tenets
+
+1. **Best lightweight job discovery engine** — Maximum sources, maximum reliability, zero dependencies, perfect for CI and scripting.
+2. **CLI-first** — No web UI, no dashboards, no servers. Terminal output and file exports (JSON/CSV) only.
+3. **Built for CI** — Designed to run in GitHub Actions, cron jobs, and headless environments without Docker, without hosting, and without managing a server. Configure once, schedule it, get jobs in your inbox or artifacts.
+
 ## Run the project
 
 ```bash
