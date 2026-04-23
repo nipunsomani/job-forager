@@ -186,6 +186,100 @@ class TestSearchFilters(unittest.TestCase):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].title, "Python Developer")
 
+    def test_filter_by_title_keywords_match(self) -> None:
+        from jobforager.search import filter_by_title_keywords
+        jobs = [
+            self._make_job(title="Security Engineer"),
+            self._make_job(title="Software Developer"),
+        ]
+        result = filter_by_title_keywords(jobs, ["Security"])
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].title, "Security Engineer")
+
+    def test_filter_by_title_keywords_no_match(self) -> None:
+        from jobforager.search import filter_by_title_keywords
+        jobs = [
+            self._make_job(title="Software Developer"),
+            self._make_job(title="Data Scientist"),
+        ]
+        result = filter_by_title_keywords(jobs, ["Security"])
+        self.assertEqual(len(result), 0)
+
+    def test_filter_by_title_keywords_ignores_description(self) -> None:
+        from jobforager.search import filter_by_title_keywords
+        jobs = [
+            self._make_job(title="Software Developer", description="We need security expertise."),
+            self._make_job(title="Security Engineer", description="Build secure systems."),
+        ]
+        result = filter_by_title_keywords(jobs, ["security"])
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].title, "Security Engineer")
+
+    def test_filter_by_desc_keywords_match(self) -> None:
+        from jobforager.search import filter_by_desc_keywords
+        jobs = [
+            self._make_job(description="Experience with AWS required."),
+            self._make_job(description="Experience with Azure required."),
+        ]
+        result = filter_by_desc_keywords(jobs, ["AWS"])
+        self.assertEqual(len(result), 1)
+        self.assertIn("AWS", result[0].description or "")
+
+    def test_filter_by_desc_keywords_ignores_title(self) -> None:
+        from jobforager.search import filter_by_desc_keywords
+        jobs = [
+            self._make_job(title="AWS Engineer", description="General engineering."),
+            self._make_job(title="DevOps Engineer", description="Experience with AWS required."),
+        ]
+        result = filter_by_desc_keywords(jobs, ["aws"])
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].title, "DevOps Engineer")
+
+    def test_apply_search_filters_with_title_keywords(self) -> None:
+        from jobforager.search import apply_search_filters
+        jobs = [
+            self._make_job(title="Security Engineer", description="We use python."),
+            self._make_job(title="Python Developer", description="Security background preferred."),
+        ]
+        result = apply_search_filters(
+            jobs,
+            keywords=["python"],
+            location_query=None,
+            since=None,
+            last_duration=None,
+            title_keywords=["Security"],
+        )
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].title, "Security Engineer")
+
+    def test_filter_by_location_uk_alias(self) -> None:
+        jobs = [
+            self._make_job(location="United Kingdom"),
+            self._make_job(location="London, UK"),
+            self._make_job(location="New York, US"),
+            self._make_job(location="Remote"),
+        ]
+        result = filter_by_location(jobs, "UK")
+        self.assertEqual(len(result), 3)
+        self.assertEqual(
+            [j.location for j in result],
+            ["United Kingdom", "London, UK", "Remote"],
+        )
+
+    def test_filter_by_location_london_query(self) -> None:
+        jobs = [
+            self._make_job(location="London"),
+            self._make_job(location="London, UK"),
+            self._make_job(location="Manchester, UK"),
+            self._make_job(location="New York"),
+        ]
+        result = filter_by_location(jobs, "London")
+        self.assertEqual(len(result), 2)
+        self.assertEqual(
+            [j.location for j in result],
+            ["London", "London, UK"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

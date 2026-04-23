@@ -5,3 +5,5 @@ __pycache__/
 venv/
 dev-docs/
 CHANGELOG.md
+AGENTS.md
+tmp/

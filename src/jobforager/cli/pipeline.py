@@ -107,6 +107,8 @@ def run_search_pipeline(
     last_duration: timedelta | None,
     level: str | None,
     hide_recruiters: bool,
+    title_keywords: list[str] | None = None,
+    desc_keywords: list[str] | None = None,
 ) -> dict[str, Any]:
     registry, enabled = build_registry(source_names, workers)
     errors: dict[str, str] = {}
@@ -129,6 +131,8 @@ def run_search_pipeline(
         last_duration=last_duration,
         level=level,
         hide_recruiters=hide_recruiters,
+        title_keywords=title_keywords,
+        desc_keywords=desc_keywords,
     )
 
     unique_records, unique_keys = dedupe_records(filtered)

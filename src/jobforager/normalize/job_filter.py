@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from jobforager.models import CandidateProfile, JobRecord
+from jobforager.normalize.location_resolver import location_matches
 
 
 def filter_jobs(
@@ -40,10 +41,7 @@ def _matches_remote_preference(job: JobRecord, profile: CandidateProfile) -> boo
 def _matches_locations(job: JobRecord, profile: CandidateProfile) -> bool:
     if not profile.locations:
         return True
-    if job.location is None:
-        return True
-    job_loc = job.location.lower()
-    return any(loc.lower() in job_loc or job_loc in loc.lower() for loc in profile.locations)
+    return location_matches(job.location, profile.locations)
 
 
 def _matches_titles(job: JobRecord, profile: CandidateProfile) -> bool:

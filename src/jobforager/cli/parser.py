@@ -68,6 +68,16 @@ def build_parser() -> argparse.ArgumentParser:
         help="Comma-separated keywords to match in title, company, tags, description.",
     )
     search_parser.add_argument(
+        "--title-keywords",
+        default=None,
+        help="Comma-separated keywords to match ONLY in job titles.",
+    )
+    search_parser.add_argument(
+        "--desc-keywords",
+        default=None,
+        help="Comma-separated keywords to match ONLY in job descriptions.",
+    )
+    search_parser.add_argument(
         "--exclude",
         default=None,
         help="Comma-separated keywords to EXCLUDE from results.",

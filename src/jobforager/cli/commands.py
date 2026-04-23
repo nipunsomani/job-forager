@@ -180,6 +180,14 @@ def _run_search_command(args: argparse.Namespace) -> int:
     if args.exclude:
         excluded = [kw.strip() for kw in args.exclude.split(",") if kw.strip()]
 
+    title_keywords = None
+    if args.title_keywords:
+        title_keywords = [kw.strip() for kw in args.title_keywords.split(",") if kw.strip()]
+
+    desc_keywords = None
+    if args.desc_keywords:
+        desc_keywords = [kw.strip() for kw in args.desc_keywords.split(",") if kw.strip()]
+
     since_dt: datetime | None = None
     if args.since:
         try:
@@ -242,6 +250,8 @@ def _run_search_command(args: argparse.Namespace) -> int:
         last_duration=last_duration,
         level=args.level,
         hide_recruiters=args.hide_recruiters,
+        title_keywords=title_keywords,
+        desc_keywords=desc_keywords,
     )
 
     active_sources = result["active_sources"]

@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from jobforager.models.job_record import JobRecord
+from jobforager.normalize.location_resolver import location_matches
 
 __all__ = [
     "filter_by_keywords",
@@ -13,6 +14,8 @@ __all__ = [
     "filter_by_experience_level",
     "filter_by_recruiter",
     "apply_search_filters",
+    "filter_by_title_keywords",
+    "filter_by_desc_keywords",
 ]
 
 
@@ -61,30 +64,41 @@ def filter_by_keywords(
     return matched
 
 
+def filter_by_title_keywords(
+    records: list[JobRecord], keywords: list[str] | None
+) -> list[JobRecord]:
+    if not keywords:
+        return records
+    matched: list[JobRecord] = []
+    keyword_lower = [kw.lower() for kw in keywords]
+    for job in records:
+        if job.title and any(kw in job.title.lower() for kw in keyword_lower):
+            matched.append(job)
+    return matched
+
+
+def filter_by_desc_keywords(
+    records: list[JobRecord], keywords: list[str] | None
+) -> list[JobRecord]:
+    if not keywords:
+        return records
+    matched: list[JobRecord] = []
+    keyword_lower = [kw.lower() for kw in keywords]
+    for job in records:
+        if job.description and any(kw in job.description.lower() for kw in keyword_lower):
+            matched.append(job)
+    return matched
+
+
 def filter_by_location(
     records: list[JobRecord], location_query: str | None
 ) -> list[JobRecord]:
-    """
-    Filter records by location substring match.
-
-    Args:
-        records: List of JobRecord objects to filter.
-        location_query: Location string to search for. If None or empty,
-            returns all records unchanged.
-
-    Returns:
-        List of records where location contains the query (case-insensitive),
-        or where location is None.
-    """
     if not location_query or not location_query.strip():
         return records
-
-    query_lower = location_query.lower()
-
     return [
         job
         for job in records
-        if job.location is None or query_lower in job.location.lower()
+        if location_matches(job.location, [location_query])
     ]
 
 
@@ -196,8 +210,12 @@ def apply_search_filters(
     excluded: list[str] | None = None,
     level: str | None = None,
     hide_recruiters: bool = False,
+    title_keywords: list[str] | None = None,
+    desc_keywords: list[str] | None = None,
 ) -> list[JobRecord]:
     result = filter_by_keywords(records, keywords)
+    result = filter_by_title_keywords(result, title_keywords)
+    result = filter_by_desc_keywords(result, desc_keywords)
     result = filter_by_excluded_keywords(result, excluded)
     result = filter_by_location(result, location_query)
     result = filter_by_date(result, since, last_duration)

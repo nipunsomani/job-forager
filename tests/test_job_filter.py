@@ -75,7 +75,7 @@ class TestJobFilter(unittest.TestCase):
             self._make_job(location="New York"),
         ]
         result = filter_jobs(jobs, profile)
-        self.assertEqual([j.location for j in result], ["London, UK"])
+        self.assertEqual([j.location for j in result], ["London, UK", "Remote"])
 
     def test_locations_filter_keeps_none_location(self) -> None:
         profile = CandidateProfile(locations=["London"])
