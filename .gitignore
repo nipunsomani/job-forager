@@ -7,3 +7,6 @@ dev-docs/
 CHANGELOG.md
 AGENTS.md
 tmp/
+session-*.md
+commands_original.py
+tests/file_adapter_tmp_*.csv
