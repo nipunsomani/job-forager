@@ -78,6 +78,12 @@ class JobStore:
         if not jobs:
             return 0, 0
 
+        # Filter out records missing required fields before DB insert
+        jobs = [
+            j for j in jobs
+            if j.get("job_url") and j.get("title") and j.get("company")
+        ]
+
         conn = sqlite3.connect(self.path)
         try:
             urls = [j["job_url"] for j in jobs if j.get("job_url")]
