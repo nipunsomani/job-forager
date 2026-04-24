@@ -32,9 +32,13 @@ class CollectorRegistry:
         records: list[dict[str, Any]] = []
         for name, enabled in enabled_sources.items():
             if enabled and name in self._collectors:
+                print(f"collector_start source={name}")
                 try:
-                    records.extend(self._collectors[name]())
+                    result = self._collectors[name]()
+                    print(f"collector_done source={name} jobs={len(result)}")
+                    records.extend(result)
                 except Exception as exc:
+                    print(f"collector_error source={name} error={exc}")
                     if errors is not None:
                         errors[name] = str(exc)
         return records
@@ -63,12 +67,16 @@ class CollectorRegistry:
                 executor.submit(fn): name
                 for name, fn in active_collectors.items()
             }
+            for name in active_collectors:
+                print(f"collector_start source={name}")
             for future in as_completed(futures):
                 name = futures[future]
                 try:
                     result = future.result()
+                    print(f"collector_done source={name} jobs={len(result)}")
                     records.extend(result)
                 except Exception as exc:
+                    print(f"collector_error source={name} error={exc}")
                     if errors is not None:
                         errors[name] = str(exc)
 

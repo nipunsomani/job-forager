@@ -101,6 +101,7 @@ class JobStore:
                     ).fetchall()
                     existing.update(row[0] for row in rows)
 
+            newly_inserted: set[str] = set()
             for job in jobs:
                 job_url = job.get("job_url")
                 if not job_url:
@@ -132,7 +133,7 @@ class JobStore:
                     now,
                 )
 
-                if job_url in existing:
+                if job_url in existing or job_url in newly_inserted:
                     conn.execute(
                         "UPDATE jobs SET last_seen_at = ? WHERE job_url = ?",
                         (now, job_url),
@@ -151,6 +152,7 @@ class JobStore:
                         params,
                     )
                     inserted += 1
+                    newly_inserted.add(job_url)
 
             conn.commit()
         finally:

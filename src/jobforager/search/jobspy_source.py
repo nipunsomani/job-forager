@@ -97,10 +97,12 @@ def _collect_jobspy_for_site(
 ) -> list[dict[str, Any]]:
     """Fetch jobs from a single JobSpy-supported site."""
     try:
+        # Glassdoor can't parse free-text locations; skip it to avoid 400 errors
+        loc = None if site_name.lower() == "glassdoor" else location
         jobs_df = scrape_jobs(
             site_name=[site_name],
             search_term=search_term,
-            location=location,
+            location=loc,
             results_wanted=results_wanted,
             hours_old=hours_old,
         )
