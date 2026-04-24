@@ -60,7 +60,8 @@ def build_parser() -> argparse.ArgumentParser:
         help=(
             "Search live job sources (remotive, hackernews, remoteok, "
             "arbeitnow, greenhouse, lever, ashby, smartrecruiters, workday, "
-            "hiringcafe, linkedin, indeed, glassdoor)."
+            "hiringcafe, linkedin, indeed, glassdoor, "
+            "weworkremotely)."
         ),
     )
     search_parser.add_argument(
@@ -117,8 +118,8 @@ def build_parser() -> argparse.ArgumentParser:
         help=(
             "Comma-separated source list. Available: remotive, hackernews, "
             "remoteok, arbeitnow, greenhouse, lever, ashby, smartrecruiters, "
-            "workday, hiringcafe, linkedin, indeed, glassdoor. "
-            "(default: remotive,hackernews)."
+            "workday, hiringcafe, linkedin, indeed, glassdoor, "
+            "weworkremotely. (default: remotive,hackernews)."
         ),
     )
     search_parser.add_argument(
@@ -143,6 +144,50 @@ def build_parser() -> argparse.ArgumentParser:
         dest="output_csv",
         default=None,
         help="Path to write normalized records as CSV.",
+    )
+    search_parser.add_argument(
+        "--output-md",
+        dest="output_md",
+        default=None,
+        help="Path to write normalized records as Markdown.",
+    )
+    search_parser.add_argument(
+        "--db-path",
+        default=None,
+        help="Path to SQLite database for incremental job tracking.",
+    )
+    search_parser.add_argument(
+        "--since-last-run",
+        dest="since_last_run",
+        action="store_true",
+        help="Only show jobs discovered since the last run (requires --db-path or uses default cache location).",
+    )
+    search_parser.add_argument(
+        "--no-validate",
+        dest="no_validate",
+        action="store_true",
+        help="Skip per-job URL validation (faster, avoids rate limits).",
+    )
+
+    health_parser = subparsers.add_parser(
+        "health",
+        help="Probe each source with 1 job and report OK/FAIL.",
+    )
+    health_parser.add_argument(
+        "--sources",
+        default="all",
+        help=(
+            "Comma-separated source list or 'all'. Available: remotive, hackernews, "
+            "remoteok, arbeitnow, greenhouse, lever, ashby, smartrecruiters, "
+            "workday, hiringcafe, linkedin, indeed, glassdoor, "
+            "weworkremotely. (default: all)."
+        ),
+    )
+    health_parser.add_argument(
+        "--timeout",
+        type=int,
+        default=30,
+        help="Timeout in seconds per source (default: 30).",
     )
 
     return parser

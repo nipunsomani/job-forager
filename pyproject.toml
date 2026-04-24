@@ -14,7 +14,7 @@ authors = [
 maintainers = [
     { name = "Nipun Somani", email = "18125240+nipunsomani@users.noreply.github.com" },
 ]
-dependencies = []
+dependencies = ["python-jobspy>=1.1.80"]
 
 [project.urls]
 Homepage = "https://github.com/nipunsomani/job-forager"

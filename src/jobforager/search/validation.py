@@ -1,6 +1,7 @@
 """URL validation utilities for job records."""
 
 import ssl
+import time
 import urllib.request
 from datetime import datetime, timedelta, timezone
 from typing import Any
@@ -67,4 +68,9 @@ def validate_job_urls(jobs: list[JobRecord], timeout: float = 5.0) -> list[dict[
     Returns:
         List of result dicts (same order as input jobs).
     """
-    return [validate_job_url(job.job_url, timeout=timeout) for job in jobs]
+    results = []
+    for i, job in enumerate(jobs):
+        results.append(validate_job_url(job.job_url, timeout=timeout))
+        if i < len(jobs) - 1:
+            time.sleep(0.3)
+    return results

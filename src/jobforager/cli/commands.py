@@ -3,15 +3,21 @@ from __future__ import annotations
 import argparse
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from typing import Any
 
 from jobforager.collectors import CollectorRegistry, load_raw_records_from_file
 from jobforager.config import load_candidate_profile
-from jobforager.exporters import write_normalized_csv, write_normalized_json
+from jobforager.exporters import (
+    write_normalized_csv,
+    write_normalized_json,
+    write_normalized_markdown,
+)
 from jobforager.formatters import build_summary, build_search_summary
 from jobforager.models import JobRecord
 from jobforager.normalize import build_dedupe_key, filter_jobs, normalize_raw_job_record
 from jobforager.samples import sample_raw_records
 from jobforager.cli.pipeline import run_search_pipeline
+from jobforager.search.health_probes import all_sources, run_health_probe
 
 
 def _print_help_status() -> None:
@@ -224,6 +230,7 @@ def _run_search_command(args: argparse.Namespace) -> int:
         "greenhouse", "lever", "ashby", "smartrecruiters",
         "workday", "hiringcafe",
         "linkedin", "indeed", "glassdoor",
+        "weworkremotely",
     ]
 
     source_names = [s.strip() for s in args.sources.split(",") if s.strip()]
@@ -253,6 +260,9 @@ def _run_search_command(args: argparse.Namespace) -> int:
         hide_recruiters=args.hide_recruiters,
         title_keywords=title_keywords,
         desc_keywords=desc_keywords,
+        db_path=args.db_path,
+        since_last_run=args.since_last_run,
+        no_validate=args.no_validate,
     )
 
     active_sources = result["active_sources"]
@@ -272,11 +282,13 @@ def _run_search_command(args: argparse.Namespace) -> int:
     print(f"unique={result['unique_count']}")
     if result["duplicate_count"]:
         print(f"duplicates={result['duplicate_count']}")
+    if args.since_last_run:
+        print(f"new_since_last_run={result['new_since_last_run']}")
 
     def _safe(value: str | None) -> str:
         if not value:
             return ""
-        return value.encode("utf-8", errors="replace").decode("utf-8")
+        return value.encode("ascii", errors="replace").decode("ascii")
 
     for index, job in enumerate(unique_records, start=1):
         print(
@@ -318,6 +330,13 @@ def _run_search_command(args: argparse.Namespace) -> int:
         write_normalized_csv(unique_records, unique_keys, args.output_csv)
         print(f"wrote_csv={args.output_csv}")
 
+    if args.output_md:
+        print(
+            f"export_md records={len(unique_records)} path={args.output_md}"
+        )
+        write_normalized_markdown(unique_records, unique_keys, args.output_md)
+        print(f"wrote_md={args.output_md}")
+
     has_skipped = bool(normalization_errors)
     has_collector_errors = bool(errors)
     if has_skipped and has_collector_errors:
@@ -333,4 +352,34 @@ def _run_search_command(args: argparse.Namespace) -> int:
     return 0
 
 
+def _run_health_command(args: argparse.Namespace) -> int:
+    source_names = [s.strip() for s in args.sources.split(",") if s.strip()]
+    if source_names == ["all"]:
+        source_names = all_sources()
 
+    timeout = float(args.timeout)
+    ok_count = 0
+    fail_count = 0
+    results: list[tuple[str, dict[str, Any]]] = []
+    for source in source_names:
+        result = run_health_probe(source, timeout)
+        results.append((source, result))
+        if result["status"] == "ok":
+            ok_count += 1
+        else:
+            fail_count += 1
+
+    for source, result in results:
+        line = (
+            f"source={source} status={result['status']} "
+            f"jobs_found={result.get('jobs_found', 0)} "
+            f"elapsed_ms={result.get('elapsed_ms', 0)}"
+        )
+        error = result.get("error")
+        if error:
+            line += f' error="{error}"'
+        print(line)
+
+    total = len(source_names)
+    print(f"summary total={total} ok={ok_count} fail={fail_count}")
+    return 0 if fail_count == 0 else 1

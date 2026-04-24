@@ -24,7 +24,9 @@ from jobforager.search.remoteok import collect_remoteok_jobs
 from jobforager.search.remotive import collect_remotive_jobs
 from jobforager.search.smartrecruiters import collect_smartrecruiters_jobs
 from jobforager.search.workday import collect_workday_jobs
-from jobforager.search.validation import validate_job_urls
+from jobforager.search.weworkremotely import collect_weworkremotely_jobs
+from jobforager.search.validation import validate_job_url
+from jobforager.storage import JobStore
 
 logger = logging.getLogger("jobforager.pipeline")
 
@@ -60,6 +62,7 @@ def build_registry(
         "glassdoor": lambda: collect_glassdoor_jobs(
             search_term=search_term, location=location_query
         ),
+        "weworkremotely": collect_weworkremotely_jobs,
     }
 
     for name in enabled:
@@ -99,11 +102,19 @@ def dedupe_records(records: list[JobRecord]) -> tuple[list[JobRecord], list[str]
     return unique_records, unique_keys
 
 
+_SKIP_VALIDATION_SOURCES = {"weworkremotely", "hiringcafe"}
+
+
 def validate_records(records: list[JobRecord]) -> tuple[int, int]:
-    validation_results = validate_job_urls(records)
     validated_count = 0
     invalid_count = 0
-    for job, result in zip(records, validation_results, strict=True):
+    for job in records:
+        if job.source in _SKIP_VALIDATION_SOURCES:
+            job.metadata["validated"] = "skipped"
+            job.metadata["http_code"] = None
+            validated_count += 1
+            continue
+        result = validate_job_url(job.job_url)
         job.metadata["validated"] = result["status"]
         job.metadata["http_code"] = result.get("http_code")
         if result["status"] == "ok":
@@ -126,6 +137,9 @@ def run_search_pipeline(
     hide_recruiters: bool,
     title_keywords: list[str] | None = None,
     desc_keywords: list[str] | None = None,
+    db_path: str | None = None,
+    since_last_run: bool = False,
+    no_validate: bool = False,
 ) -> dict[str, Any]:
     search_term = " ".join(keywords) if keywords else None
     if search_term is None and title_keywords:
@@ -160,12 +174,46 @@ def run_search_pipeline(
         desc_keywords=desc_keywords,
     )
 
-    unique_records, unique_keys = dedupe_records(filtered)
-    validated_count, invalid_count = validate_records(unique_records)
-
     active_sources = [
         name for name in source_names if name in registry.available_sources()
     ]
+
+    store: JobStore | None = None
+    db_path_used: str | None = None
+    new_since_last_run = 0
+
+    if db_path or since_last_run:
+        store = JobStore(db_path)
+        db_path_used = store.path
+
+    if store is not None:
+        store.upsert_jobs(raw_records)
+
+        if since_last_run:
+            last_run = store.get_last_run_time()
+            if last_run is not None:
+                new_db_jobs = store.get_jobs_since(last_run)
+                new_urls = {j["job_url"] for j in new_db_jobs}
+                filtered = [job for job in filtered if job.job_url in new_urls]
+
+    unique_records, unique_keys = dedupe_records(filtered)
+    if not no_validate:
+        validated_count, invalid_count = validate_records(unique_records)
+    else:
+        validated_count = 0
+        invalid_count = 0
+        for job in unique_records:
+            job.metadata["validated"] = "skipped"
+            job.metadata["http_code"] = None
+
+    if store is not None:
+        if since_last_run:
+            new_since_last_run = len(unique_records)
+        store.record_run(
+            sources=active_sources,
+            keywords=",".join(keywords) if keywords else None,
+            new_jobs_count=new_since_last_run,
+        )
 
     source_counts = Counter(job.source for job in unique_records)
 
@@ -183,4 +231,6 @@ def run_search_pipeline(
         "keys": unique_keys,
         "normalization_errors": normalization_errors,
         "collector_errors": errors,
+        "new_since_last_run": new_since_last_run,
+        "db_path": db_path_used,
     }

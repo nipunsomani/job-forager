@@ -1,21 +1,13 @@
 """JobSpy collector for LinkedIn, Indeed, and Glassdoor.
 
-This module wraps the optional ``python-jobspy`` package to scrape
-major job boards. If JobSpy is not installed the collectors return
-empty lists silently, preserving the stdlib-only guarantee of the
-core tool.
+This module wraps the ``python-jobspy`` package to scrape major job boards.
 """
 
 from __future__ import annotations
 
 from typing import Any
 
-try:
-    from jobspy import scrape_jobs
-
-    _JOBSPY_AVAILABLE = True
-except Exception:  # pragma: no cover
-    _JOBSPY_AVAILABLE = False
+from jobspy import scrape_jobs
 
 _DEFAULT_SEARCH_TERM = ""
 _DEFAULT_RESULTS_WANTED = 50
@@ -104,9 +96,6 @@ def _collect_jobspy_for_site(
     hours_old: int | None = _DEFAULT_HOURS_OLD,
 ) -> list[dict[str, Any]]:
     """Fetch jobs from a single JobSpy-supported site."""
-    if not _JOBSPY_AVAILABLE:
-        return []
-
     try:
         jobs_df = scrape_jobs(
             site_name=[site_name],

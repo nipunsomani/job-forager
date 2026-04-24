@@ -85,11 +85,8 @@ class TestSearchCli(unittest.TestCase):
                 return_value=fake_hn,
             ):
                 with patch(
-                    "jobforager.cli.pipeline.validate_job_urls",
-                    return_value=[
-                        {"status": "ok", "http_code": 200},
-                        {"status": "ok", "http_code": 200},
-                    ],
+                    "jobforager.cli.pipeline.validate_job_url",
+                    return_value={"status": "ok", "http_code": 200},
                 ):
                     output = io.StringIO()
                     with contextlib.redirect_stdout(output):
@@ -146,10 +143,8 @@ class TestSearchCli(unittest.TestCase):
                 return_value=[],
             ):
                 with patch(
-                    "jobforager.cli.pipeline.validate_job_urls",
-                    return_value=[
-                        {"status": "ok", "http_code": 200},
-                    ],
+                    "jobforager.cli.pipeline.validate_job_url",
+                    return_value={"status": "ok", "http_code": 200},
                 ):
                     output = io.StringIO()
                     with contextlib.redirect_stdout(output):
@@ -195,8 +190,8 @@ class TestSearchCli(unittest.TestCase):
                 side_effect=failing_hn,
             ):
                 with patch(
-                    "jobforager.cli.pipeline.validate_job_urls",
-                    return_value=[{"status": "ok", "http_code": 200}],
+                    "jobforager.cli.pipeline.validate_job_url",
+                    return_value={"status": "ok", "http_code": 200},
                 ):
                     output = io.StringIO()
                     with contextlib.redirect_stdout(output):
@@ -256,10 +251,8 @@ class TestSearchCli(unittest.TestCase):
                 return_value=[],
             ):
                 with patch(
-                    "jobforager.cli.pipeline.validate_job_urls",
-                    return_value=[
-                        {"status": "ok", "http_code": 200},
-                    ],
+                    "jobforager.cli.pipeline.validate_job_url",
+                    return_value={"status": "ok", "http_code": 200},
                 ):
                     output = io.StringIO()
                     with contextlib.redirect_stdout(output):

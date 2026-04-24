@@ -24,9 +24,9 @@ jobs:
           key: jobdb-${{ runner.os }}-${{ github.run_id }}
           restore-keys: jobdb-${{ runner.os }}-
 
-      - name: Install optional dependencies
+      - name: Install dependencies
         run: |
-          pip install python-jobspy || true
+          pip install -e .
 
       - name: Run incremental job search
         env:

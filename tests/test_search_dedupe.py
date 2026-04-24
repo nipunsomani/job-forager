@@ -43,8 +43,8 @@ class TestSearchDedupe(unittest.TestCase):
                 return_value=fake_hn,
             ):
                 with patch(
-                    "jobforager.cli.pipeline.validate_job_urls",
-                    return_value=[{"status": "ok", "http_code": 200}],
+                    "jobforager.cli.pipeline.validate_job_url",
+                    return_value={"status": "ok", "http_code": 200},
                 ):
                     output = io.StringIO()
                     with contextlib.redirect_stdout(output):
