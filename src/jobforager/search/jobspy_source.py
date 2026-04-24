@@ -30,6 +30,126 @@ def _is_valid_number(value: Any) -> bool:
         return False
 
 
+def _detect_country_indeed(location: str | None) -> str | None:
+    """Return a ``country_indeed`` value for JobSpy based on *location*.
+
+    JobSpy's Indeed scraper defaults to ``country_indeed='USA'``, which means
+    a location like ``"London"`` resolves to London, Ohio rather than London,
+    UK.  Passing the correct country code ensures the right Indeed domain
+    (e.g. ``uk.indeed.com``) and API country context are used.
+    """
+    if not location:
+        return None
+    loc_lower = location.lower()
+    if any(token in loc_lower for token in ("uk", "united kingdom", "england", "scotland", "wales", "northern ireland", "london", "manchester", "birmingham", "bristol", "leeds", "edinburgh", "glasgow", "cardiff")):
+        return "UK"
+    if any(token in loc_lower for token in ("usa", "united states", "us", "america", "california", "texas", "new york", "florida", "illinois", "washington", "san francisco", "seattle", "austin", "boston", "chicago", "los angeles")):
+        return "USA"
+    if any(token in loc_lower for token in ("canada", "ca", "toronto", "vancouver", "montreal", "ottawa", "calgary", "edmonton")):
+        return "CANADA"
+    if any(token in loc_lower for token in ("germany", "de", "berlin", "munich", "hamburg", "cologne", "frankfurt")):
+        return "GERMANY"
+    if any(token in loc_lower for token in ("france", "fr", "paris", "lyon", "marseille", "toulouse", "nice")):
+        return "FRANCE"
+    if any(token in loc_lower for token in ("netherlands", "nl", "amsterdam", "rotterdam", "the hague", "utrecht")):
+        return "NETHERLANDS"
+    if any(token in loc_lower for token in ("ireland", "ie", "dublin", "cork", "galway", "limerick")):
+        return "IRELAND"
+    if any(token in loc_lower for token in ("india", "in", "bangalore", "mumbai", "delhi", "hyderabad", "chennai", "pune", "kolkata")):
+        return "INDIA"
+    if any(token in loc_lower for token in ("australia", "au", "sydney", "melbourne", "brisbane", "perth", "adelaide")):
+        return "AUSTRALIA"
+    if any(token in loc_lower for token in ("singapore", "sg")):
+        return "SINGAPORE"
+    if any(token in loc_lower for token in ("spain", "es", "madrid", "barcelona", "valencia", "seville")):
+        return "SPAIN"
+    if any(token in loc_lower for token in ("italy", "it", "rome", "milan", "naples", "turin", "florence")):
+        return "ITALY"
+    if any(token in loc_lower for token in ("switzerland", "ch", "zurich", "geneva", "basel", "bern")):
+        return "SWITZERLAND"
+    if any(token in loc_lower for token in ("sweden", "se", "stockholm", "gothenburg", "malmo")):
+        return "SWEDEN"
+    if any(token in loc_lower for token in ("poland", "pl", "warsaw", "krakow", "wroclaw", "gdansk")):
+        return "POLAND"
+    if any(token in loc_lower for token in ("portugal", "pt", "lisbon", "porto", "braga")):
+        return "PORTUGAL"
+    if any(token in loc_lower for token in ("brazil", "br", "sao paulo", "rio de janeiro", "brasilia", "salvador")):
+        return "BRAZIL"
+    if any(token in loc_lower for token in ("mexico", "mx", "mexico city", "guadalajara", "monterrey")):
+        return "MEXICO"
+    if any(token in loc_lower for token in ("argentina", "ar", "buenos aires", "cordoba", "rosario")):
+        return "ARGENTINA"
+    if any(token in loc_lower for token in ("south africa", "za", "johannesburg", "cape town", "durban")):
+        return "SOUTH_AFRICA"
+    if any(token in loc_lower for token in ("uae", "united arab emirates", "dubai", "abu dhabi", "sharjah")):
+        return "UNITED_ARAB_EMIRATES"
+    if any(token in loc_lower for token in ("japan", "jp", "tokyo", "osaka", "kyoto", "yokohama")):
+        return "JAPAN"
+    if any(token in loc_lower for token in ("south korea", "kr", "seoul", "busan", "incheon")):
+        return "SOUTH_KOREA"
+    if any(token in loc_lower for token in ("philippines", "ph", "manila", "cebu", "davao")):
+        return "PHILIPPINES"
+    if any(token in loc_lower for token in ("indonesia", "id", "jakarta", "surabaya", "bandung")):
+        return "INDONESIA"
+    if any(token in loc_lower for token in ("malaysia", "my", "kuala lumpur", "penang", "johor bahru")):
+        return "MALAYSIA"
+    if any(token in loc_lower for token in ("thailand", "th", "bangkok", "chiang mai", "phuket")):
+        return "THAILAND"
+    if any(token in loc_lower for token in ("vietnam", "vn", "ho chi minh", "hanoi", "da nang")):
+        return "VIETNAM"
+    if any(token in loc_lower for token in ("nigeria", "ng", "lagos", "abuja", "ibadan")):
+        return "NIGERIA"
+    if any(token in loc_lower for token in ("kenya", "ke", "nairobi", "mombasa")):
+        return "KENYA"
+    if any(token in loc_lower for token in ("egypt", "eg", "cairo", "alexandria", "giza")):
+        return "EGYPT"
+    if any(token in loc_lower for token in ("turkey", "tr", "istanbul", "ankara", "izmir")):
+        return "TURKEY"
+    if any(token in loc_lower for token in ("israel", "il", "tel aviv", "jerusalem", "haifa")):
+        return "ISRAEL"
+    if any(token in loc_lower for token in ("new zealand", "nz", "auckland", "wellington", "christchurch")):
+        return "NEW_ZEALAND"
+    if any(token in loc_lower for token in ("denmark", "dk", "copenhagen", "aarhus", "odense")):
+        return "DENMARK"
+    if any(token in loc_lower for token in ("norway", "no", "oslo", "bergen", "trondheim")):
+        return "NORWAY"
+    if any(token in loc_lower for token in ("finland", "fi", "helsinki", "espoo", "tampere")):
+        return "FINLAND"
+    if any(token in loc_lower for token in ("belgium", "be", "brussels", "antwerp", "ghent")):
+        return "BELGIUM"
+    if any(token in loc_lower for token in ("austria", "at", "vienna", "salzburg", "graz", "linz")):
+        return "AUSTRIA"
+    if any(token in loc_lower for token in ("czech republic", "cz", "prague", "brno", "ostrava")):
+        return "CZECH_REPUBLIC"
+    if any(token in loc_lower for token in ("hungary", "hu", "budapest", "debrecen", "szeged")):
+        return "HUNGARY"
+    if any(token in loc_lower for token in ("romania", "ro", "bucharest", "cluj", "timisoara")):
+        return "ROMANIA"
+    if any(token in loc_lower for token in ("bulgaria", "bg", "sofia", "plovdiv", "varna")):
+        return "BULGARIA"
+    if any(token in loc_lower for token in ("croatia", "hr", "zagreb", "split", "rijeka")):
+        return "CROATIA"
+    if any(token in loc_lower for token in ("slovenia", "si", "ljubljana", "maribor")):
+        return "SLOVENIA"
+    if any(token in loc_lower for token in ("slovakia", "sk", "bratislava", "kosice")):
+        return "SLOVAKIA"
+    if any(token in loc_lower for token in ("estonia", "ee", "tallinn", "tartu")):
+        return "ESTONIA"
+    if any(token in loc_lower for token in ("latvia", "lv", "riga", "daugavpils")):
+        return "LATVIA"
+    if any(token in loc_lower for token in ("lithuania", "lt", "vilnius", "kaunas")):
+        return "LITHUANIA"
+    if any(token in loc_lower for token in ("luxembourg", "lu", "luxembourg city")):
+        return "LUXEMBOURG"
+    if any(token in loc_lower for token in ("cyprus", "cy", "nicosia", "limassol")):
+        return "CYPRUS"
+    if any(token in loc_lower for token in ("malta", "mt", "valletta", "sliema")):
+        return "MALTA"
+    if any(token in loc_lower for token in ("iceland", "is", "reykjavik")):
+        return "ICELAND"
+    return None
+
+
 def _map_jobspy_row(row: dict[str, Any]) -> dict[str, Any] | None:
     """Map a single JobSpy DataFrame row to a Job Forager raw record."""
     title = str(row.get("title") or "").strip()
@@ -115,12 +235,18 @@ def _scrape_once(
     try:
         # Glassdoor can't parse free-text locations; skip it to avoid 400 errors
         loc = None if site_name.lower() == "glassdoor" else location
+        extra_kwargs: dict[str, Any] = {}
+        if site_name.lower() == "indeed":
+            country = _detect_country_indeed(location)
+            if country:
+                extra_kwargs["country_indeed"] = country
         jobs_df = scrape_jobs(
             site_name=[site_name],
             search_term=search_term,
             location=loc,
             results_wanted=results_wanted,
             hours_old=hours_old,
+            **extra_kwargs,
         )
     except Exception:
         return []
