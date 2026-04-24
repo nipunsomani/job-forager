@@ -81,15 +81,19 @@ class JobStore:
         conn = sqlite3.connect(self.path)
         try:
             urls = [j["job_url"] for j in jobs if j.get("job_url")]
+            # SQLite has a limit on the number of variables per query
+            # (typically 999). Batch the IN clause to stay under it.
+            _BATCH_SIZE = 500
+            existing: set[str] = set()
             if urls:
-                placeholders = ",".join("?" * len(urls))
-                existing_rows = conn.execute(
-                    f"SELECT job_url FROM jobs WHERE job_url IN ({placeholders})",
-                    urls,
-                ).fetchall()
-                existing = {row[0] for row in existing_rows}
-            else:
-                existing = set()
+                for i in range(0, len(urls), _BATCH_SIZE):
+                    batch = urls[i : i + _BATCH_SIZE]
+                    placeholders = ",".join("?" * len(batch))
+                    rows = conn.execute(
+                        f"SELECT job_url FROM jobs WHERE job_url IN ({placeholders})",
+                        batch,
+                    ).fetchall()
+                    existing.update(row[0] for row in rows)
 
             for job in jobs:
                 job_url = job.get("job_url")
