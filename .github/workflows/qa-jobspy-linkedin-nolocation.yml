@@ -1,0 +1,28 @@
+name: QA JobSpy LinkedIn No Location
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+      - name: LinkedIn simple query no location
+        env:
+          PYTHONPATH: src
+        run: |
+          python -m jobforager.cli search \
+            --sources linkedin \
+            --title-keywords "security engineer" \
+            --last 5h \
+            --output-json results.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qa-linkedin-nolocation
+          path: results.json
+          retention-days: 1
