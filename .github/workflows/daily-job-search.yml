@@ -33,10 +33,10 @@ jobs:
           PYTHONPATH: src
         run: |
           python -m jobforager.cli search \
-            --sources all \
+            --sources linkedin,indeed \
             --title-keywords "Application Security,Application Security Engineer,Security,Security Engineer,Pentest,Penetration Test,Penetration Tester,Penetration Testing Engineer,Offensive Security,Offensive Security Engineer,Offsec,Offsec Engineer,Product Security,Product Security Engineer" \
             --location "UK, London" \
-            --last 1d \
+            --last 5h \
             --since-last-run \
             --output-json new_jobs.json
 
