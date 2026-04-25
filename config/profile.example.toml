@@ -25,3 +25,4 @@ enable_linkedin = true
 enable_indeed = true
 enable_glassdoor = true
 enable_weworkremotely = true
+enable_adzuna = true

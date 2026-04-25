@@ -9,6 +9,7 @@ from jobforager.collectors import CollectorRegistry
 from jobforager.models import JobRecord, CandidateProfile
 from jobforager.normalize import build_dedupe_key, filter_jobs, normalize_raw_job_record
 from jobforager.search import apply_search_filters
+from jobforager.search.adzuna import collect_adzuna_jobs
 from jobforager.search.ashby import collect_ashby_jobs
 from jobforager.search.arbeitnow import collect_arbeitnow_jobs
 from jobforager.search.greenhouse import collect_greenhouse_jobs
@@ -63,6 +64,9 @@ def build_registry(
             search_term=search_term, location=location_query
         ),
         "weworkremotely": collect_weworkremotely_jobs,
+        "adzuna": lambda: collect_adzuna_jobs(
+            search_term=search_term, location=location_query
+        ),
     }
 
     for name in enabled:

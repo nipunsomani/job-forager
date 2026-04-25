@@ -4,6 +4,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Callable
 
+from jobforager.search.adzuna import collect_adzuna_jobs
 from jobforager.search.ashby import collect_ashby_jobs
 from jobforager.search.arbeitnow import collect_arbeitnow_jobs
 from jobforager.search.greenhouse import collect_greenhouse_jobs
@@ -141,6 +142,10 @@ def probe_weworkremotely(timeout: float) -> dict[str, Any]:
     return _probe_generic(lambda: collect_weworkremotely_jobs()[:1], timeout)
 
 
+def probe_adzuna(timeout: float) -> dict[str, Any]:
+    return _probe_generic(lambda: collect_adzuna_jobs()[:1], timeout)
+
+
 _PROBE_MAP: dict[str, Callable[[float], dict[str, Any]]] = {
     "remotive": probe_remotive,
     "hackernews": probe_hackernews,
@@ -156,6 +161,7 @@ _PROBE_MAP: dict[str, Callable[[float], dict[str, Any]]] = {
     "indeed": probe_indeed,
     "glassdoor": probe_glassdoor,
     "weworkremotely": probe_weworkremotely,
+    "adzuna": probe_adzuna,
 }
 
 
