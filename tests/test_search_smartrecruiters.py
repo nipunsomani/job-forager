@@ -41,7 +41,7 @@ class TestCollectSmartRecruitersJobs(unittest.TestCase):
                     "company": {"name": "Adobe"},
                     "location": {"city": "San Francisco", "country": "US"},
                     "postingUrl": "https://jobs.smartrecruiters.com/adobe1/job-123",
-                    "createdOn": "2024-01-15T09:00:00Z",
+                    "releasedDate": "2024-01-15T09:00:00Z",
                     "refNumber": "REF-001",
                     "jobAd": {
                         "sections": {

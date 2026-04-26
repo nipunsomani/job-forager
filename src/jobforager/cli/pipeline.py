@@ -53,7 +53,9 @@ def build_registry(
         "workday": lambda: collect_workday_jobs(
             max_results_per_company=None, max_workers=workers
         ),
-        "hiringcafe": lambda: collect_hiringcafe_jobs(max_results=None),
+        "hiringcafe": lambda: collect_hiringcafe_jobs(
+            search_term=search_term, location=location_query
+        ),
         "linkedin": lambda: collect_linkedin_jobs(
             search_term=search_term, location=location_query
         ),

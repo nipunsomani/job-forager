@@ -117,7 +117,7 @@ def _fetch_smartrecruiters_company(company_slug: str) -> list[dict[str, Any]]:
             "salary_raw": None,
             "salary_min_usd": None,
             "salary_max_usd": None,
-            "posted_at": _extract_string(job, "createdOn"),
+            "posted_at": _extract_string(job, "releasedDate"),
             "apply_url": None,
             "external_id": _extract_string(job, "id"),
             "description": description,
