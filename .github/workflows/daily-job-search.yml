@@ -33,7 +33,7 @@ jobs:
           PYTHONPATH: src
         run: |
           python -m jobforager.cli search \
-            --sources remotive,hackernews,remoteok,arbeitnow,greenhouse,lever,ashby,smartrecruiters,workday,hiringcafe,linkedin,indeed,weworkremotely,adzuna \
+            --sources remotive,hackernews,remoteok,arbeitnow,greenhouse,lever,ashby,smartrecruiters,workday,hiringcafe,linkedin,indeed,weworkremotely,adzuna,pinpoint \
             --title-keywords "Application Security,Application Security Engineer,Security,Security Engineer,Pentest,Penetration Test,Penetration Tester,Penetration Testing Engineer,Offensive Security,Offensive Security Engineer,Offsec,Offsec Engineer,Product Security,Product Security Engineer" \
             --location "UK, London" \
             --last 1d \

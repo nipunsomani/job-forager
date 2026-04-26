@@ -15,6 +15,7 @@ from jobforager.search.arbeitnow import collect_arbeitnow_jobs
 from jobforager.search.greenhouse import collect_greenhouse_jobs
 from jobforager.search.hackernews import collect_hackernews_jobs
 from jobforager.search.hiringcafe import collect_hiringcafe_jobs
+from jobforager.search.pinpoint import collect_pinpoint_jobs
 from jobforager.search.jobspy_source import (
     collect_glassdoor_jobs,
     collect_indeed_jobs,
@@ -67,6 +68,9 @@ def build_registry(
         ),
         "weworkremotely": collect_weworkremotely_jobs,
         "adzuna": lambda: collect_adzuna_jobs(
+            search_term=search_term, location=location_query
+        ),
+        "pinpoint": lambda: collect_pinpoint_jobs(
             search_term=search_term, location=location_query
         ),
     }

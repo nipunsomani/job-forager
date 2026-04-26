@@ -10,6 +10,7 @@ from jobforager.search.arbeitnow import collect_arbeitnow_jobs
 from jobforager.search.greenhouse import collect_greenhouse_jobs
 from jobforager.search.hackernews import collect_hackernews_jobs
 from jobforager.search.hiringcafe import collect_hiringcafe_jobs
+from jobforager.search.pinpoint import collect_pinpoint_jobs
 from jobforager.search.jobspy_source import (
     collect_glassdoor_jobs,
     collect_indeed_jobs,
@@ -146,6 +147,10 @@ def probe_adzuna(timeout: float) -> dict[str, Any]:
     return _probe_generic(lambda: collect_adzuna_jobs()[:1], timeout)
 
 
+def probe_pinpoint(timeout: float) -> dict[str, Any]:
+    return _probe_generic(lambda: collect_pinpoint_jobs(max_results=1), timeout)
+
+
 _PROBE_MAP: dict[str, Callable[[float], dict[str, Any]]] = {
     "remotive": probe_remotive,
     "hackernews": probe_hackernews,
@@ -162,6 +167,7 @@ _PROBE_MAP: dict[str, Callable[[float], dict[str, Any]]] = {
     "glassdoor": probe_glassdoor,
     "weworkremotely": probe_weworkremotely,
     "adzuna": probe_adzuna,
+    "pinpoint": probe_pinpoint,
 }
 
 

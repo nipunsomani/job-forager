@@ -1,6 +1,6 @@
 # AGENTS.md — Job Forager
 
-Python 3.10+ CLI that aggregates live job listings from 15 sources. Zero core dependencies (stdlib only).
+Python 3.10+ CLI that aggregates live job listings from 16 sources. Zero core dependencies (stdlib only).
 
 ## Project Tenets
 
