@@ -1,13 +1,15 @@
 # AGENTS.md — Job Forager
 
-Python 3.10+ CLI that aggregates live job listings from 16 sources. Zero core dependencies (stdlib only).
+Python 3.10+ CLI that aggregates live job listings from **17 sources** covering thousands of companies across every major ATS platform. One dependency (`python-jobspy`) required for LinkedIn, Indeed, and Glassdoor scraping; all other 14 sources use stdlib only.
 
 ## Project Tenets
 
 1. **Best lightweight job discovery engine** — Maximum sources, maximum reliability, zero dependencies, perfect for CI and scripting.
-2. **CLI-first** — No web UI, no dashboards, no servers. Terminal output and file exports (JSON/CSV) only.
+2. **CLI-first** — No web UI, no dashboards, no servers. Terminal output and file exports (JSON/CSV/Markdown) only.
 3. **Built for CI** — Designed to run in GitHub Actions, cron jobs, and headless environments without Docker, without hosting, and without managing a server. Configure once, schedule it, get jobs in your inbox or artifacts.
 4. **Due diligence over surface answers** — Before implementing or recommending anything, research the underlying mechanism (read source code, test APIs, verify behavior). Never assume. Always verify with actual data.
+5. **Fetch live jobs on every run** — No job-level cache. Each execution hits live APIs and feeds for the freshest listings. SQLite is used only for incremental discovery (`--since-last-run`), not as a substitute for live fetching.
+6. **Designed for scheduled execution** — Meant to be run on a schedule via GitHub Actions CI workflows, cron, or any scheduler. Configure once, automate indefinitely.
 
 ## AI Agent Operating Rules
 
@@ -49,7 +51,7 @@ PYTHONPATH=src python -m unittest tests.test_search_remotive -v
 ## Architecture
 
 - `src/jobforager/cli/` — Entrypoint (`__main__.py`), parser, commands, pipeline orchestration.
-- `src/jobforager/search/` — One module per live source (remotive, greenhouse, lever, ashby, workday, smartrecruiters, hackernews, remoteok, arbeitnow, hiringcafe, adzuna, jobspy_source, weworkremotely).
+- `src/jobforager/search/` — One module per live source: remotive, hackernews, remoteok, arbeitnow, greenhouse, lever, ashby, smartrecruiters, workday, hiringcafe, weworkremotely, adzuna, pinpoint, twosigma, plus `jobspy_source` (LinkedIn, Indeed, Glassdoor).
 - `src/jobforager/normalize/` — Normalization, deduplication, filtering, ATS detection, experience-level extraction, recruiter detection.
 - `src/jobforager/models/` — `JobRecord` and `CandidateProfile` dataclasses.
 - `src/jobforager/collectors/` — `CollectorRegistry` (sequential + `ThreadPoolExecutor` concurrent collection).
@@ -63,10 +65,32 @@ PYTHONPATH=src python -m unittest tests.test_search_remotive -v
 - The CLI package is `jobforager.cli`; console script entrypoint is `job-forager`.
 - No external runtime dependencies. Optional: `playwright` for CI scraping; `python-jobspy` for LinkedIn/Indeed/Glassdoor sources.
 
+## Source Coverage
+
+| # | Source | Type | Companies/Boards | Auth Required |
+|---|--------|------|------------------|---------------|
+| 1 | **Remotive** | API | 1 board | No |
+| 2 | **Hacker News** | API | Monthly thread | No |
+| 3 | **RemoteOK** | API | 1 board | No |
+| 4 | **ArbeitNow** | API | 1 board | No |
+| 5 | **Greenhouse** | API | 8,032+ boards | No |
+| 6 | **Lever** | API | 4,368+ companies | No |
+| 7 | **Ashby** | API | 2,796+ boards | No |
+| 8 | **SmartRecruiters** | API | 812+ companies | No |
+| 9 | **Workday** | API | 2,836+ companies | No |
+| 10 | **Hiring.cafe** | Next.js Data API | Aggregator | No |
+| 11 | **WeWorkRemotely** | RSS | 1 board | No |
+| 12 | **Adzuna** | API | Aggregator | Free API key |
+| 13 | **Pinpoint** | API | 76+ subdomains | No |
+| 14 | **Two Sigma** | RSS (Avature) | 1 company | No |
+| 15 | **LinkedIn** | Scraping | Aggregator | `python-jobspy` |
+| 16 | **Indeed** | Scraping | Aggregator | `python-jobspy` |
+| 17 | **Glassdoor** | Scraping | Aggregator | `python-jobspy` (broken upstream) |
+
 ## Commands and gotchas
 
 - `hunt` only supports `--dry-run` (Phase 1.2 scaffolding).
-- `search` hits live APIs. Default sources: `remotive,hackernews`. Use `--sources all` for all 15.
+- `search` hits live APIs. Default sources: `remotive,hackernews`. Use `--sources all` for all 17.
 - `search --workers 30` is the default concurrency level for multi-company sources.
 - `search --since-last-run` outputs only jobs discovered since the previous run (uses SQLite DB at `~/.cache/jobforager/jobs.db` or custom `--db-path`).
 - Workday is slow (5-10+ min full scan) but enabled in CI.

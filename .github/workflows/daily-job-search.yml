@@ -33,9 +33,9 @@ jobs:
           PYTHONPATH: src
         run: |
           python -m jobforager.cli search \
-            --sources remotive,hackernews,remoteok,arbeitnow,greenhouse,lever,ashby,smartrecruiters,workday,hiringcafe,linkedin,indeed,weworkremotely,adzuna,pinpoint \
+            --sources all \
             --title-keywords "Application Security,Application Security Engineer,Security,Security Engineer,Pentest,Penetration Test,Penetration Tester,Penetration Testing Engineer,Offensive Security,Offensive Security Engineer,Offsec,Offsec Engineer,Product Security,Product Security Engineer" \
-            --location "UK, London" \
+            --location "UK, London, remote" \
             --last 1d \
             --since-last-run \
             --output-json new_jobs.json

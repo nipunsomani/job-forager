@@ -20,6 +20,7 @@ from jobforager.search.lever import collect_lever_jobs
 from jobforager.search.remoteok import collect_remoteok_jobs
 from jobforager.search.remotive import collect_remotive_jobs
 from jobforager.search.smartrecruiters import collect_smartrecruiters_jobs
+from jobforager.search.twosigma import collect_twosigma_jobs
 from jobforager.search.workday import collect_workday_jobs
 from jobforager.search.weworkremotely import collect_weworkremotely_jobs
 from jobforager.company_lists import get_smartrecruiters_slugs
@@ -143,6 +144,10 @@ def probe_weworkremotely(timeout: float) -> dict[str, Any]:
     return _probe_generic(lambda: collect_weworkremotely_jobs()[:1], timeout)
 
 
+def probe_twosigma(timeout: float) -> dict[str, Any]:
+    return _probe_generic(lambda: collect_twosigma_jobs()[:1], timeout)
+
+
 def probe_adzuna(timeout: float) -> dict[str, Any]:
     return _probe_generic(lambda: collect_adzuna_jobs()[:1], timeout)
 
@@ -166,6 +171,7 @@ _PROBE_MAP: dict[str, Callable[[float], dict[str, Any]]] = {
     "indeed": probe_indeed,
     "glassdoor": probe_glassdoor,
     "weworkremotely": probe_weworkremotely,
+    "twosigma": probe_twosigma,
     "adzuna": probe_adzuna,
     "pinpoint": probe_pinpoint,
 }

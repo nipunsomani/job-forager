@@ -25,6 +25,7 @@ from jobforager.search.lever import collect_lever_jobs
 from jobforager.search.remoteok import collect_remoteok_jobs
 from jobforager.search.remotive import collect_remotive_jobs
 from jobforager.search.smartrecruiters import collect_smartrecruiters_jobs
+from jobforager.search.twosigma import collect_twosigma_jobs
 from jobforager.search.workday import collect_workday_jobs
 from jobforager.search.weworkremotely import collect_weworkremotely_jobs
 from jobforager.search.validation import validate_job_url
@@ -67,6 +68,7 @@ def build_registry(
             search_term=search_term, location=location_query
         ),
         "weworkremotely": collect_weworkremotely_jobs,
+        "twosigma": collect_twosigma_jobs,
         "adzuna": lambda: collect_adzuna_jobs(
             search_term=search_term, location=location_query
         ),

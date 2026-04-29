@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "job-forager"
 version = "0.1.0"
-description = "Open-source job hunting CLI with live multi-source aggregation, zero dependencies"
+description = "Open-source job hunting CLI with live multi-source aggregation. One dependency (python-jobspy) required for LinkedIn, Indeed, and Glassdoor scraping; all other 14 sources use stdlib only."
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [

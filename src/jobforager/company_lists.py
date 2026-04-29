@@ -26,21 +26,28 @@ _STAPPLY_BASE = (
 
 _DEFAULT_GREENHOUSE_TOKENS = [
     "airbnb", "stripe", "figma", "anthropic", "hootsuite", "canonical",
+    "wehrtyou", "monzo", "tide",
 ]
 _DEFAULT_LEVER_SLUGS = [
     "airbnb", "netflix", "shopify", "leverdemo",
+    "zopa",
 ]
 _DEFAULT_ASHBY_BOARDS = [
     "supabase", "ramp", "figma", "linear", "vercel", "openai",
+    "clearbank",
 ]
 
 _DEFAULT_SMARTRECRUITERS_SLUGS = [
     "adobe1", "canva", "deloitte6", "experian", "samsung1",
+    "wise",
 ]
 
 _DEFAULT_WORKDAY_COMPANIES = [
     {"name": "Accenture", "url": "https://accenture.wd103.myworkdayjobs.com/accenturecareers"},
     {"name": "NVIDIA", "url": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite"},
+    {"name": "Morgan Stanley", "url": "https://ms.wd5.myworkdayjobs.com/External"},
+    {"name": "Deutsche Bank", "url": "https://db.wd3.myworkdayjobs.com/DBWebsite"},
+    {"name": "Brevan Howard", "url": "https://wd3.myworkdaysite.com/recruiting/brevanhoward/BH_ExternalCareers"},
 ]
 
 _HEADERS = {
@@ -272,7 +279,7 @@ def get_workday_companies() -> list[dict[str, str]]:
     local_data = _load_local_workday(local_path)
 
     defaults = _DEFAULT_WORKDAY_COMPANIES
-    base = local_data if local_data is not None else defaults
+    base = _merge_workday_lists(defaults, local_data or [])
 
     fetched = None
     for url_suffix in (

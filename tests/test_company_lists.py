@@ -81,7 +81,7 @@ class TestGetGreenhouseTokens(unittest.TestCase):
             tokens = get_greenhouse_tokens()
         expected = sorted(
             set(
-                ["airbnb", "stripe", "figma", "anthropic", "hootsuite", "canonical"]
+                ["airbnb", "stripe", "figma", "anthropic", "hootsuite", "canonical", "wehrtyou", "monzo", "tide"]
                 + ["stripe", "figma", "anthropic"]
             )
         )
@@ -115,7 +115,7 @@ class TestGetLeverSlugs(unittest.TestCase):
             slugs = get_lever_slugs()
         expected = sorted(
             set(
-                ["airbnb", "netflix", "shopify", "leverdemo"]
+                ["airbnb", "netflix", "shopify", "leverdemo", "zopa"]
                 + ["netflix", "shopify"]
             )
         )
@@ -149,7 +149,7 @@ class TestGetAshbyBoards(unittest.TestCase):
             boards = get_ashby_boards()
         expected = sorted(
             set(
-                ["supabase", "ramp", "figma", "linear", "vercel", "openai"]
+                ["supabase", "ramp", "figma", "linear", "vercel", "openai", "clearbank"]
                 + ["ramp", "linear"]
             )
         )
@@ -183,7 +183,7 @@ class TestGetSmartrecruitersSlugs(unittest.TestCase):
             slugs = get_smartrecruiters_slugs()
         expected = sorted(
             set(
-                ["adobe1", "canva", "deloitte6", "experian", "samsung1"]
+                ["adobe1", "canva", "deloitte6", "experian", "samsung1", "wise"]
                 + ["canva", "deloitte6"]
             )
         )

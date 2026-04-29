@@ -10,3 +10,4 @@ tmp/
 session-*.md
 commands_original.py
 tests/file_adapter_tmp_*.csv
+RULES.md

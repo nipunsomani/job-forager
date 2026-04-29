@@ -4,7 +4,7 @@ import json
 import unittest
 from unittest.mock import patch
 
-from jobforager.search.workday import collect_workday_jobs
+from jobforager.search.workday import collect_workday_jobs, _parse_workday_url
 
 
 class MockResponse:
@@ -202,6 +202,36 @@ class TestCollectWorkdayJobs(unittest.TestCase):
                 delay=0,
             )
         self.assertEqual(results, [])
+
+
+class TestParseWorkdayUrl(unittest.TestCase):
+    def test_standard_format(self) -> None:
+        result = _parse_workday_url(
+            "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite"
+        )
+        self.assertEqual(result["domain"], "nvidia.wd5.myworkdayjobs.com")
+        self.assertEqual(result["company_name"], "nvidia")
+        self.assertEqual(result["site_name"], "NVIDIAExternalCareerSite")
+        self.assertEqual(
+            result["api_base_url"],
+            "https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite",
+        )
+
+    def test_myworkdaysite_recruiting_format(self) -> None:
+        result = _parse_workday_url(
+            "https://wd3.myworkdaysite.com/recruiting/brevanhoward/BH_ExternalCareers"
+        )
+        self.assertEqual(result["domain"], "wd3.myworkdaysite.com")
+        self.assertEqual(result["company_name"], "brevanhoward")
+        self.assertEqual(result["site_name"], "BH_ExternalCareers")
+        self.assertEqual(
+            result["api_base_url"],
+            "https://wd3.myworkdaysite.com/wday/cxs/brevanhoward/BH_ExternalCareers",
+        )
+
+    def test_invalid_url_raises(self) -> None:
+        with self.assertRaises(ValueError):
+            _parse_workday_url("not-a-url")
 
 
 if __name__ == "__main__":

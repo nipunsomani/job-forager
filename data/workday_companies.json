@@ -1,5 +1,25 @@
 [
   {
+    "name": "Accenture",
+    "url": "https://accenture.wd103.myworkdayjobs.com/accenturecareers"
+  },
+  {
+    "name": "NVIDIA",
+    "url": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite"
+  },
+  {
+    "name": "Morgan Stanley",
+    "url": "https://ms.wd5.myworkdayjobs.com/External"
+  },
+  {
+    "name": "Deutsche Bank",
+    "url": "https://db.wd3.myworkdayjobs.com/DBWebsite"
+  },
+  {
+    "name": "Brevan Howard",
+    "url": "https://wd3.myworkdaysite.com/recruiting/brevanhoward/BH_ExternalCareers"
+  },
+  {
     "name": "2020Companies",
     "url": "https://2020companies.wd1.myworkdayjobs.com/external_careers"
   },
@@ -126,10 +146,6 @@
   {
     "name": "Accelya",
     "url": "https://accelya.wd103.myworkdayjobs.com/careers"
-  },
-  {
-    "name": "Accenture",
-    "url": "https://accenture.wd103.myworkdayjobs.com/accenturecareers"
   },
   {
     "name": "Accenture",

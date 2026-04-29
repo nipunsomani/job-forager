@@ -233,6 +233,7 @@ def _run_search_command(args: argparse.Namespace) -> int:
         "weworkremotely",
         "adzuna",
         "pinpoint",
+        "twosigma",
     ]
 
     source_names = [s.strip() for s in args.sources.split(",") if s.strip()]

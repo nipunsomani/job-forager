@@ -36,12 +36,17 @@ def _parse_workday_url(career_site_url: str) -> dict[str, str]:
     domain = match.group(1)
     path = match.group(2)
 
-    company_match = re.match(r"^([^.]+)\.", domain)
-    if not company_match:
-        raise ValueError(f"Could not extract company from domain: {domain}")
-
-    company_name = company_match.group(1)
-    site_name = path.split("/")[-1] or path
+    # Handle myworkdaysite.com/recruiting/{company}/{site} format
+    recruiting_match = re.match(r"recruiting/([^/]+)/(.+)", path)
+    if recruiting_match:
+        company_name = recruiting_match.group(1)
+        site_name = recruiting_match.group(2)
+    else:
+        company_match = re.match(r"^([^.]+)\.", domain)
+        if not company_match:
+            raise ValueError(f"Could not extract company from domain: {domain}")
+        company_name = company_match.group(1)
+        site_name = path.split("/")[-1] or path
 
     api_base_url = f"https://{domain}/wday/cxs/{company_name}/{site_name}"
 
