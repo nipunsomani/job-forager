@@ -2,12 +2,12 @@
 
 This document outlines planned improvements and extensions for Job Forager. Items are organized by phase and priority.
 
-## Phase 1.x — Ingestion Foundation (Current)
+## Phase 1.x - Ingestion Foundation (Current)
 
 ### High Priority
 
 - [ ] **More job sources**
-  - LinkedIn (requires browser automation or third-party API — research needed)
+  - LinkedIn (requires browser automation or third-party API - research needed)
   - Indeed (RSS feeds or scraping)
   - ZipRecruiter (API or scraping)
   - We Work Remotely (scraping)
@@ -27,7 +27,7 @@ This document outlines planned improvements and extensions for Job Forager. Item
   - Concurrent fetching with `threading` (respecting rate limits)
 
 - [ ] **Result caching (optional)**
-  - Cache raw API responses for 1-6 hours (not company lists — those are always fetched live)
+  - Cache raw API responses for 1-6 hours (not company lists - those are always fetched live)
   - Cache normalized records to avoid re-processing
   - SQLite or JSON-based cache store
 
@@ -51,7 +51,7 @@ This document outlines planned improvements and extensions for Job Forager. Item
   - Profile inheritance/composition
   - CLI wizard for first-time setup
 
-## Phase 2 — ATS Detection & Apply Routing
+## Phase 2 - ATS Detection & Apply Routing
 
 ### High Priority
 
@@ -87,7 +87,7 @@ This document outlines planned improvements and extensions for Job Forager. Item
   - Follow-up reminders
   - Application timeline visualization
 
-## Phase 3 — Scoring & Ranking
+## Phase 3 - Scoring & Ranking
 
 ### High Priority
 
@@ -128,7 +128,7 @@ This document outlines planned improvements and extensions for Job Forager. Item
   - Cost-of-living adjustment
   - Compensation tier classification
 
-## Later — Apply-Assist & Automation
+## Later - Apply-Assist & Automation
 
 ### High Priority
 

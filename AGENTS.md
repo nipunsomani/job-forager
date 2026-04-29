@@ -1,24 +1,24 @@
-# AGENTS.md — Job Forager
+# AGENTS.md - Job Forager
 
 Python 3.10+ CLI that aggregates live job listings from **17 sources** covering thousands of companies across every major ATS platform. One dependency (`python-jobspy`) required for LinkedIn, Indeed, and Glassdoor scraping; all other 14 sources use stdlib only.
 
 ## Project Tenets
 
-1. **Best lightweight job discovery engine** — Maximum sources, maximum reliability, zero dependencies, perfect for CI and scripting.
-2. **CLI-first** — No web UI, no dashboards, no servers. Terminal output and file exports (JSON/CSV/Markdown) only.
-3. **Built for CI** — Designed to run in GitHub Actions, cron jobs, and headless environments without Docker, without hosting, and without managing a server. Configure once, schedule it, get jobs in your inbox or artifacts.
-4. **Due diligence over surface answers** — Before implementing or recommending anything, research the underlying mechanism (read source code, test APIs, verify behavior). Never assume. Always verify with actual data.
-5. **Fetch live jobs on every run** — No job-level cache. Each execution hits live APIs and feeds for the freshest listings. SQLite is used only for incremental discovery (`--since-last-run`), not as a substitute for live fetching.
-6. **Designed for scheduled execution** — Meant to be run on a schedule via GitHub Actions CI workflows, cron, or any scheduler. Configure once, automate indefinitely.
+1. **Best lightweight job discovery engine** - Maximum sources, maximum reliability, zero dependencies, perfect for CI and scripting.
+2. **CLI-first** - No web UI, no dashboards, no servers. Terminal output and file exports (JSON/CSV/Markdown) only.
+3. **Built for CI** - Designed to run in GitHub Actions, cron jobs, and headless environments without Docker, without hosting, and without managing a server. Configure once, schedule it, get jobs in your inbox or artifacts.
+4. **Due diligence over surface answers** - Before implementing or recommending anything, research the underlying mechanism (read source code, test APIs, verify behavior). Never assume. Always verify with actual data.
+5. **Fetch live jobs on every run** - No job-level cache. Each execution hits live APIs and feeds for the freshest listings. SQLite is used only for incremental discovery (`--since-last-run`), not as a substitute for live fetching.
+6. **Designed for scheduled execution** - Meant to be run on a schedule via GitHub Actions CI workflows, cron, or any scheduler. Configure once, automate indefinitely.
 
 ## AI Agent Operating Rules
 
 All agents working on this project must follow the rules in `RULES.md`:
 
 1. **No GitHub pushes without explicit permission.**
-2. **No surface-level answers** — deep research, find workarounds, present options for review.
-3. **No assumptions** — ask when uncertain; never hardcode lists or defaults without approval.
-4. **No auto-fixes** — flag broken things and wait for direction.
+2. **No surface-level answers** - deep research, find workarounds, present options for review.
+3. **No assumptions** - ask when uncertain; never hardcode lists or defaults without approval.
+4. **No auto-fixes** - flag broken things and wait for direction.
 5. **Do not break anything; do not touch anything not asked for.**
 
 ## Run the project
@@ -50,14 +50,14 @@ PYTHONPATH=src python -m unittest tests.test_search_remotive -v
 
 ## Architecture
 
-- `src/jobforager/cli/` — Entrypoint (`__main__.py`), parser, commands, pipeline orchestration.
-- `src/jobforager/search/` — One module per live source: remotive, hackernews, remoteok, arbeitnow, greenhouse, lever, ashby, smartrecruiters, workday, hiringcafe, weworkremotely, adzuna, pinpoint, twosigma, plus `jobspy_source` (LinkedIn, Indeed, Glassdoor).
-- `src/jobforager/normalize/` — Normalization, deduplication, filtering, ATS detection, experience-level extraction, recruiter detection.
-- `src/jobforager/models/` — `JobRecord` and `CandidateProfile` dataclasses.
-- `src/jobforager/collectors/` — `CollectorRegistry` (sequential + `ThreadPoolExecutor` concurrent collection).
-- `src/jobforager/exporters/` — JSON and CSV writers.
-- `src/jobforager/config/` — TOML profile loader.
-- `src/jobforager/storage/` — SQLite-backed `JobStore` for incremental discovery and job persistence across runs.
+- `src/jobforager/cli/` - Entrypoint (`__main__.py`), parser, commands, pipeline orchestration.
+- `src/jobforager/search/` - One module per live source: remotive, hackernews, remoteok, arbeitnow, greenhouse, lever, ashby, smartrecruiters, workday, hiringcafe, weworkremotely, adzuna, pinpoint, twosigma, plus `jobspy_source` (LinkedIn, Indeed, Glassdoor).
+- `src/jobforager/normalize/` - Normalization, deduplication, filtering, ATS detection, experience-level extraction, recruiter detection.
+- `src/jobforager/models/` - `JobRecord` and `CandidateProfile` dataclasses.
+- `src/jobforager/collectors/` - `CollectorRegistry` (sequential + `ThreadPoolExecutor` concurrent collection).
+- `src/jobforager/exporters/` - JSON and CSV writers.
+- `src/jobforager/config/` - TOML profile loader.
+- `src/jobforager/storage/` - SQLite-backed `JobStore` for incremental discovery and job persistence across runs.
 
 ## Key conventions
 
@@ -103,13 +103,13 @@ PYTHONPATH=src python -m unittest tests.test_search_remotive -v
 
 ## Known limitations
 
-### Hiring.cafe — rewritten
+### Hiring.cafe - rewritten
 The collector was completely rewritten to use HiringCafe's Next.js data API (`/_next/data/{buildId}/index.json`) instead of browser automation. Build IDs auto-discover from 404 responses. Locations are resolved dynamically via `/api/searchLocation` (no hardcoded whitelist). Multi-location queries use OR/union logic. City-level locations search at country level with client-side post-filtering.
 
-### startup.jobs — evaluated and rejected
+### startup.jobs - evaluated and rejected
 `startup.jobs` was evaluated as a potential source (job-ops supports it). It uses Algolia for search, but the Algolia API key is **referrer-restricted** and the site itself is protected by Cloudflare. Direct HTTP and even `curl_cffi` can fetch the HTML page, but the extracted Algolia credentials fail when used outside the browser context. Job-ops solves this with Camoufox (stealth browser) + `page.evaluate()` to call Algolia from inside the page. We intentionally do not adopt browser-heavy dependencies (violates "zero core dependencies" and "CI-optimized" tenets). Rejected as unimplementable within our architecture.
 
 ## GitHub Actions
 
-- `.github/workflows/ci.yml` — runs on push/PR to `main`, matrix Python 3.10–3.13.
-- `.github/workflows/daily-job-search.yml` — scheduled at 01:00 UTC. Uses `actions/cache` to persist the job database between runs for incremental discovery. Outputs only new jobs via `--since-last-run`.
+- `.github/workflows/ci.yml` - runs on push/PR to `main`, matrix Python 3.10–3.13.
+- `.github/workflows/daily-job-search.yml` - scheduled at 01:00 UTC. Uses `actions/cache` to persist the job database between runs for incremental discovery. Outputs only new jobs via `--since-last-run`.

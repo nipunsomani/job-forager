@@ -1,8 +1,8 @@
 <div align="center">
   <img src="assets/logo.svg" alt="Job Forager Logo" width="120" height="120">
   <h1>Job Forager</h1>
-  <p><strong>The best free, open-source job hunting automation tool.</strong></p>
-  <p>Discover real jobs from thousands of companies across every major ATS platform and job board — no paid APIs required.</p>
+  <p><strong>The best free, open-source lightweight job hunting automation tool.</strong></p>
+  <p>Discover real jobs from thousands of companies across every major ATS platform and job board - no paid APIs required.</p>
 
   <p>
     <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10+-blue.svg" alt="Python 3.10+"></a>
@@ -16,31 +16,31 @@
 
 ## What This Project Does
 
-Job Forager is a Python CLI tool that aggregates live job listings from **17 different sources** covering thousands of companies. It normalizes, deduplicates, filters, and ranks jobs against your candidate profile — giving you a curated list of real opportunities with direct apply links.
+Job Forager is a Python CLI tool that aggregates live job listings from **17 different sources** covering thousands of companies. It normalizes, deduplicates, filters, and ranks jobs against your candidate profile - giving you a curated list of real opportunities with direct apply links.
 
 ### Why Job Forager?
 
-- **No paywalls** — Every source is free. No API keys required for 15 of 17 sources.
-- **No browser automation** — Pure HTTP/API requests. Runs in 2 seconds on CI, not 2 minutes with Selenium.
-- **No stale data** — Every run hits live APIs. No job-level cache pretending yesterday's postings are fresh.
-- **Set it and forget it** — One GitHub Actions workflow, scheduled daily. New jobs land in your artifacts automatically.
-- **Zero dependencies** — Core runs on Python stdlib only. No pip install hell.
+- **No paywalls** - Every source is free. No API keys required for 15 of 17 sources.
+- **No browser automation** - Pure HTTP/API requests. Runs in 2 seconds on CI, not 2 minutes with Selenium.
+- **No stale data** - Every run hits live APIs. No job-level cache pretending yesterday's postings are fresh.
+- **Set it and forget it** - One GitHub Actions workflow, scheduled daily. New jobs land in your artifacts automatically.
+- **Zero dependencies** - Core runs on Python stdlib only. No pip install hell.
 
 ### Key Capabilities
 
-- **Multi-source job discovery** — Fetch live jobs from Remotive, Hacker News, RemoteOK, ArbeitNow, Greenhouse, Lever, Ashby, SmartRecruiters, Workday, Hiring.cafe, WeWorkRemotely, Adzuna, Pinpoint, Two Sigma, LinkedIn, Indeed, and Glassdoor
-- **Maximum coverage, no limits** — Every company endpoint and every pagination page is fetched. Greenhouse: 8,032 boards. Lever: 4,368 companies. Ashby: 2,796 boards. SmartRecruiters: 812 companies. Workday: 2,836 companies. All concurrently.
-- **Concurrent fetching** — ThreadPoolExecutor with configurable workers (`--workers 30`). 100 boards in ~2 seconds.
-- **Company list expansion** — Automatically discovers thousands of companies from public GitHub repositories (Feashliaa, stapply-ai). Fresh data on every run, no caching.
-- **ATS auto-detection** — Identifies which Applicant Tracking System each job uses from URL patterns
-- **Normalization & deduplication** — Converts disparate API formats into a single canonical `JobRecord` format, removes duplicates
-- **Profile-based filtering** — Filter by job title, skills, location, remote preference, salary floor, and date
-- **Advanced CLI filters** — `--exclude`, `--level` (intern/entry/mid/senior), `--hide-recruiters`
-- **URL validation** — Checks job URLs for 404s and availability
-- **Export** — Output results as JSON, CSV, or Markdown
-- **One dependency for scraping** — `python-jobspy` is required for LinkedIn, Indeed, and Glassdoor. All other 14 sources use Python stdlib only (`urllib`, `dataclasses`, `argparse`, `sqlite3`, etc.).
-- **Incremental discovery** — SQLite-backed job tracking. Run once to build the database, then use `--since-last-run` to output only jobs discovered since the previous execution. Perfect for scheduled CI runs.
-- **CI-optimized** — Designed for GitHub Actions with built-in caching support. No Docker, no server, no hosting required.
+- **Multi-source job discovery** - Fetch live jobs from Remotive, Hacker News, RemoteOK, ArbeitNow, Greenhouse, Lever, Ashby, SmartRecruiters, Workday, Hiring.cafe, WeWorkRemotely, Adzuna, Pinpoint, Two Sigma, LinkedIn, Indeed, and Glassdoor
+- **Maximum coverage, no limits** - Every company endpoint and every pagination page is fetched. Greenhouse: 8,032 boards. Lever: 4,368 companies. Ashby: 2,796 boards. SmartRecruiters: 812 companies. Workday: 2,836 companies. All concurrently.
+- **Concurrent fetching** - ThreadPoolExecutor with configurable workers (`--workers 30`). 100 boards in ~2 seconds.
+- **Company list expansion** - Automatically discovers thousands of companies from public GitHub repositories (Feashliaa, stapply-ai). Fresh data on every run, no caching.
+- **ATS auto-detection** - Identifies which Applicant Tracking System each job uses from URL patterns
+- **Normalization & deduplication** - Converts disparate API formats into a single canonical `JobRecord` format, removes duplicates
+- **Profile-based filtering** - Filter by job title, skills, location, remote preference, salary floor, and date
+- **Advanced CLI filters** - `--exclude`, `--level` (intern/entry/mid/senior), `--hide-recruiters`
+- **URL validation** - Checks job URLs for 404s and availability
+- **Export** - Output results as JSON, CSV, or Markdown
+- **One dependency for scraping** - `python-jobspy` is required for LinkedIn, Indeed, and Glassdoor. All other 14 sources use Python stdlib only (`urllib`, `dataclasses`, `argparse`, `sqlite3`, etc.).
+- **Incremental discovery** - SQLite-backed job tracking. Run once to build the database, then use `--since-last-run` to output only jobs discovered since the previous execution. Perfect for scheduled CI runs.
+- **CI-optimized** - Designed for GitHub Actions with built-in caching support. No Docker, no server, no hosting required.
 
 ---
 
@@ -125,20 +125,20 @@ See [`docs/CLI_REFERENCE.md`](docs/CLI_REFERENCE.md) for all commands, flags, an
 
 | Source | Type | Coverage | Auth |
 |--------|------|----------|------|
-| **Remotive** | API | Remote jobs board | — |
-| **Hacker News** | API | Monthly "Who is hiring?" thread | — |
-| **RemoteOK** | API | Remote jobs board | — |
-| **ArbeitNow** | API | EU remote jobs | — |
-| **Greenhouse** | API | 8,032+ company boards | — |
-| **Lever** | API | 4,368+ companies | — |
-| **Ashby** | API | 2,796+ boards | — |
-| **SmartRecruiters** | API | 812+ companies | — |
-| **Workday** | API | 2,836+ companies | — |
-| **Hiring.cafe** | Next.js API | Aggregator (200K+ jobs) | — |
-| **WeWorkRemotely** | RSS | Remote jobs board | — |
+| **Remotive** | API | Remote jobs board | - |
+| **Hacker News** | API | Monthly "Who is hiring?" thread | - |
+| **RemoteOK** | API | Remote jobs board | - |
+| **ArbeitNow** | API | EU remote jobs | - |
+| **Greenhouse** | API | 8,032+ company boards | - |
+| **Lever** | API | 4,368+ companies | - |
+| **Ashby** | API | 2,796+ boards | - |
+| **SmartRecruiters** | API | 812+ companies | - |
+| **Workday** | API | 2,836+ companies | - |
+| **Hiring.cafe** | Next.js API | Aggregator (200K+ jobs) | - |
+| **WeWorkRemotely** | RSS | Remote jobs board | - |
 | **Adzuna** | API | Global aggregator | Free key |
-| **Pinpoint** | API | 76+ subdomains | — |
-| **Two Sigma** | RSS (Avature) | Quant finance roles | — |
+| **Pinpoint** | API | 76+ subdomains | - |
+| **Two Sigma** | RSS (Avature) | Quant finance roles | - |
 | **LinkedIn** | Scraping | Aggregator | `python-jobspy` |
 | **Indeed** | Scraping | Aggregator | `python-jobspy` |
 | **Glassdoor** | Scraping | Aggregator | `python-jobspy`* |
@@ -150,11 +150,11 @@ See [`docs/CLI_REFERENCE.md`](docs/CLI_REFERENCE.md) for all commands, flags, an
 Job Forager uses a TOML profile for personalized filtering. The profile is applied **before** CLI flags, so CLI flags further narrow the results.
 
 When you provide a profile, jobs are filtered with **AND** logic across:
-- **Remote preference** — `remote_only` excludes non-remote jobs; `remote_preferred` allows hybrid; `any` allows all
-- **Location** — substring match against your specified locations
-- **Title** — substring match against your target titles
-- **Skills** — job must mention at least one of your skills in title, tags, or description
-- **Salary floor** — jobs below your minimum are excluded
+- **Remote preference** - `remote_only` excludes non-remote jobs; `remote_preferred` allows hybrid; `any` allows all
+- **Location** - substring match against your specified locations
+- **Title** - substring match against your target titles
+- **Skills** - job must mention at least one of your skills in title, tags, or description
+- **Salary floor** - jobs below your minimum are excluded
 
 See [`config/profile.example.toml`](config/profile.example.toml) for the complete template.
 
@@ -162,8 +162,8 @@ See [`config/profile.example.toml`](config/profile.example.toml) for the complet
 
 ## Docs
 
-- [`docs/CLI_REFERENCE.md`](docs/CLI_REFERENCE.md) — Commands, flags, and examples
-- [`docs/API_SOURCES.md`](docs/API_SOURCES.md) — Supported job sources and coverage
+- [`docs/CLI_REFERENCE.md`](docs/CLI_REFERENCE.md) - Commands, flags, and examples
+- [`docs/API_SOURCES.md`](docs/API_SOURCES.md) - Supported job sources and coverage
 
 ---
 
@@ -206,7 +206,7 @@ This means your daily artifact (`new_jobs.json`) contains only jobs discovered s
 - Restores job database from cache between runs (incremental discovery)
 - Supports JSON output upload as artifact
 - Configurable schedule via cron expression
-- No profile required — keywords and filters are inline in the workflow
+- No profile required - keywords and filters are inline in the workflow
 
 ### Manual Trigger
 

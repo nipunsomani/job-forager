@@ -1,4 +1,4 @@
-# RULES.md — Operating Guardrails for AI Agents
+# RULES.md - Operating Guardrails for AI Agents
 
 These rules are hard constraints. Check them before every action.
 
@@ -7,7 +7,7 @@ These rules are hard constraints. Check them before every action.
 - Never run `git push` unless the user explicitly says "push to GitHub", "commit and push", or similar.
 - Never assume a commit or push is implied by making changes.
 
-## 2. No surface-level answers — deep research required
+## 2. No surface-level answers - deep research required
 
 - If uncertain about anything, dig into the codebase, read source code, test APIs, and verify behavior with actual data.
 - Find options, workarounds, and alternative approaches before recommending or implementing.

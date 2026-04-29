@@ -6,13 +6,13 @@ This document describes every job source collector in detail: the API endpoint, 
 
 | Source | Endpoints Explored | Pagination | Jobs Fetched |
 |--------|-------------------|------------|--------------|
-| **Remotive** | 1 API call | None — single request | All available (~22) |
-| **Hacker News** | 1 thread + 50 comments | None — single thread | Top 50 comments |
-| **RemoteOK** | 1 API call | None — single request | All available (~99) |
-| **ArbeitNow** | 1 API call | None — single request | All available (~100) |
-| **Greenhouse** | **All 8,032 board tokens** | None — single GET per board | All jobs per board |
-| **Lever** | **All 4,368 company slugs** | None — single GET per company | All jobs per company |
-| **Ashby** | **All 2,796 board names** | None — single GET per board | All jobs per board |
+| **Remotive** | 1 API call | None - single request | All available (~22) |
+| **Hacker News** | 1 thread + 50 comments | None - single thread | Top 50 comments |
+| **RemoteOK** | 1 API call | None - single request | All available (~99) |
+| **ArbeitNow** | 1 API call | None - single request | All available (~100) |
+| **Greenhouse** | **All 8,032 board tokens** | None - single GET per board | All jobs per board |
+| **Lever** | **All 4,368 company slugs** | None - single GET per company | All jobs per company |
+| **Ashby** | **All 2,796 board names** | None - single GET per board | All jobs per board |
 | **Workday** | **All companies** (live list) | 20 jobs per page, **all pages** | Up to 2,000 per company (API hard limit) |
 | **SmartRecruiters** | **All slugs** (live list) | 100 jobs per page, **all pages** | All jobs per slug |
 | **Hiring.cafe** | 1 API query | 1,000 jobs per page, **all pages** | All matching jobs |
@@ -80,7 +80,7 @@ None. No API key required.
 
 ### Coverage
 - **Endpoints**: 1 API call (`category=software-dev`, `limit=999`)
-- **Pagination**: None — single request returns all available jobs
+- **Pagination**: None - single request returns all available jobs
 - **Jobs fetched**: All available (API ceiling, typically ~20-50)
 
 ### Notes
@@ -140,7 +140,7 @@ The parser falls back to line-by-line extraction if pipes are missing.
 
 ### Coverage
 - **Endpoints**: 1 Algolia search + 1 thread + up to 50 comment fetches
-- **Pagination**: None — fetches top 50 comments from the current month's thread
+- **Pagination**: None - fetches top 50 comments from the current month's thread
 - **Jobs fetched**: Up to 50 (all top-level comments)
 
 ### Notes
@@ -196,7 +196,7 @@ Array where the first element is metadata, rest are jobs:
 
 ### Coverage
 - **Endpoints**: 1 API call (`/api` or `/api?tag={tag}`)
-- **Pagination**: None — single request returns all available jobs
+- **Pagination**: None - single request returns all available jobs
 - **Jobs fetched**: All available (typically ~99)
 
 ### Notes
@@ -249,7 +249,7 @@ None.
 
 ### Coverage
 - **Endpoints**: 1 API call (`/api/job-board-api`)
-- **Pagination**: None — single request returns all available jobs
+- **Pagination**: None - single request returns all available jobs
 - **Jobs fetched**: All available (typically ~100)
 
 ### Notes
@@ -304,16 +304,16 @@ Checks `metadata` array for item with `name == "Workplace Type"`:
 
 ### Coverage
 - **Endpoints**: **All 8,032 board tokens** explored concurrently (30 workers)
-- **Pagination**: None — single GET per board returns all jobs
+- **Pagination**: None - single GET per board returns all jobs
 - **Jobs fetched**: All jobs from every board
 
 ### Company Lists
 - Fetches **8,032 tokens** live from Feashliaa + stapply-ai on every run
-- No local caching — fresh data on every execution
+- No local caching - fresh data on every execution
 
 ### Notes
 - `content=true` fetches full HTML descriptions (slower)
-- `metadata` may be `null` — handled gracefully
+- `metadata` may be `null` - handled gracefully
 - Concurrent fetching: 100 boards → ~1,143 jobs in ~2 seconds
 
 ---
@@ -377,12 +377,12 @@ Array of job objects:
 
 ### Coverage
 - **Endpoints**: **All 4,368 company slugs** explored concurrently (30 workers)
-- **Pagination**: None — single GET per company returns all jobs
+- **Pagination**: None - single GET per company returns all jobs
 - **Jobs fetched**: All jobs from every company
 
 ### Company Lists
 - Fetches **4,368 slugs** live from Feashliaa + stapply-ai on every run
-- No local caching — fresh data on every execution
+- No local caching - fresh data on every execution
 
 ### Notes
 - Concurrent fetching: 100 companies → ~1,051 jobs in ~20 seconds
@@ -435,12 +435,12 @@ Parses `compensation.summaryComponents` for `compensationType == "Salary"`, extr
 
 ### Coverage
 - **Endpoints**: **All 2,796 board names** explored concurrently (30 workers)
-- **Pagination**: None — single GET per board returns all jobs
+- **Pagination**: None - single GET per board returns all jobs
 - **Jobs fetched**: All jobs from every board
 
 ### Company Lists
 - Fetches **2,796 boards** live from Feashliaa + stapply-ai on every run
-- No local caching — fresh data on every execution
+- No local caching - fresh data on every execution
 
 ### Notes
 - Concurrent fetching: 100 boards → ~1,591 jobs in ~17 seconds
@@ -453,7 +453,7 @@ Parses `compensation.summaryComponents` for `compensationType == "Salary"`, extr
 **Function**: `collect_workday_jobs(companies, max_results_per_company, delay)`
 
 ### API Approach
-**Reverse-engineered Calypso API** — no official public API exists. Workday career sites expose an internal JSON API used by their frontend.
+**Reverse-engineered Calypso API** - no official public API exists. Workday career sites expose an internal JSON API used by their frontend.
 
 ### Two-Step Process
 
@@ -517,17 +517,17 @@ POST https://{company}.wd5.myworkdayjobs.com/wday/cxs/{company}/{site_name}/jobs
 ### Coverage
 - **Endpoints**: All companies from live list (currently 2: Accenture, NVIDIA)
 - **Pagination**: 20 jobs per page, **all pages fetched** until exhausted
-- **Jobs fetched**: All pages per company (up to 2,000 — Workday API hard limit)
+- **Jobs fetched**: All pages per company (up to 2,000 - Workday API hard limit)
 
 ### Company Lists
 - Fetches live from stapply-ai/ats-scrapers CSV on every run
-- No local caching — fresh data on every execution
+- No local caching - fresh data on every execution
 
 ### Known Issues
-- **2000 results maximum** per company (Workday API hard limit — cannot bypass)
+- **2000 results maximum** per company (Workday API hard limit - cannot bypass)
 - `postedOn` is a human-readable string, not a parseable date
 - Location may be missing from `bulletFields` for some postings
-- CSRF approach is brittle — may break if Workday changes their frontend
+- CSRF approach is brittle - may break if Workday changes their frontend
 
 ---
 
@@ -588,7 +588,7 @@ https://jobs.smartrecruiters.com/{company_slug}/{job_id}
 
 ### Company Lists
 - Fetches live from stapply-ai CSV on every run
-- No local caching — fresh data on every execution
+- No local caching - fresh data on every execution
 
 ### Notes
 - Description extracted from `jobAd.sections.jobDescription.text`
@@ -603,7 +603,7 @@ https://jobs.smartrecruiters.com/{company_slug}/{job_id}
 **Function**: `collect_hiringcafe_jobs(search_query, location, remote_only, max_results)`
 
 ### API Approach
-**Aggregated meta-search API** — Hiring.cafe maintains a 2.1M+ job index from 46 ATS platforms. This collector queries their API rather than scraping individual sites.
+**Aggregated meta-search API** - Hiring.cafe maintains a 2.1M+ job index from 46 ATS platforms. This collector queries their API rather than scraping individual sites.
 
 ### Endpoints
 1. **Count**: `POST https://hiring.cafe/api/search-jobs/get-total-count`
@@ -678,9 +678,9 @@ None. No API key required.
 - **Jobs fetched**: All matching jobs from the 2.1M+ index
 
 ### Transport Layers (3-Tier Fallback)
-1. `urllib` — fastest, works if no bot protection
-2. `curl_cffi` — TLS fingerprint spoofing for some WAFs
-3. `Playwright` — browser automation for Cloudflare JS challenge
+1. `urllib` - fastest, works if no bot protection
+2. `curl_cffi` - TLS fingerprint spoofing for some WAFs
+3. `Playwright` - browser automation for Cloudflare JS challenge
 
 ### Notes
 - HTML descriptions are stripped to plain text
@@ -696,7 +696,7 @@ None. No API key required.
 **Function**: `collect_linkedin_jobs(search_term, location, results_wanted, hours_old)`
 
 ### API Approach
-**Scraper-based** — JobSpy uses headless-browser-style requests to scrape LinkedIn job search results. No official public API.
+**Scraper-based** - JobSpy uses headless-browser-style requests to scrape LinkedIn job search results. No official public API.
 
 ### Authentication
 None. No API key required.
@@ -742,7 +742,7 @@ JobSpy returns a pandas DataFrame. Fields mapped to JobRecord:
 **Function**: `collect_indeed_jobs(search_term, location, results_wanted, hours_old)`
 
 ### API Approach
-**Scraper-based** — JobSpy scrapes Indeed search results HTML.
+**Scraper-based** - JobSpy scrapes Indeed search results HTML.
 
 ### Parameters
 Same interface as LinkedIn above.
@@ -764,7 +764,7 @@ Same interface as LinkedIn above.
 **Function**: `collect_glassdoor_jobs(search_term, location, results_wanted, hours_old)`
 
 ### API Approach
-**Scraper-based** — JobSpy scrapes Glassdoor job search results.
+**Scraper-based** - JobSpy scrapes Glassdoor job search results.
 
 ### Parameters
 Same interface as LinkedIn above.
@@ -804,4 +804,4 @@ Same interface as LinkedIn above.
 - **CLI `--workers` flag**: Controls concurrency for multi-company sources (default: 30)
 - All collectors gracefully handle network errors and return `[]`
 - Company lists are fetched live from GitHub on every run (no caching)
-- JobSpy sources (LinkedIn, Indeed, Glassdoor) are **optional** — install with `pip install python-jobspy`
+- JobSpy sources (LinkedIn, Indeed, Glassdoor) are **optional** - install with `pip install python-jobspy`

@@ -28,7 +28,7 @@ Dry-run config/normalize/dedupe flow is available.
 No real collectors/ATS/scoring/apply logic implemented yet.
 ```
 
-## `hunt` — Dry-Run Ingestion
+## `hunt` - Dry-Run Ingestion
 
 Simulates the full pipeline using sample data or a provided records file. Useful for testing profile configuration and export formats.
 
@@ -65,7 +65,7 @@ summary sources=sample
 status=completed_clean
 ```
 
-## `search` — Live Job Search
+## `search` - Live Job Search
 
 The primary command. Fetches live jobs from enabled sources, normalizes, filters, deduplicates, validates URLs, and optionally exports.
 
@@ -214,7 +214,7 @@ summary by_source greenhouse=7 lever=5
 status=completed_clean
 ```
 
-## `validate` — Profile Validation
+## `validate` - Profile Validation
 
 Validate a candidate profile TOML file without running a search.
 

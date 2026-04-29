@@ -2,11 +2,11 @@
 
 ## Core Principles
 
-1. **No automated job application submission** — Job Forager discovers and filters jobs. It never submits applications on behalf of users.
-2. **No credential handling** — No passwords, API keys, or OAuth tokens are stored or transmitted.
-3. **No ATS browser automation** — No Selenium, Playwright, or similar tools for automated form filling.
-4. **Additive, reversible changes only** — Every change must be undoable without data loss.
-5. **Explicit user confirmation** — Any future apply-assist features require explicit user approval per action.
+1. **No automated job application submission** - Job Forager discovers and filters jobs. It never submits applications on behalf of users.
+2. **No credential handling** - No passwords, API keys, or OAuth tokens are stored or transmitted.
+3. **No ATS browser automation** - No Selenium, Playwright, or similar tools for automated form filling.
+4. **Additive, reversible changes only** - Every change must be undoable without data loss.
+5. **Explicit user confirmation** - Any future apply-assist features require explicit user approval per action.
 
 ## Data Handling
 

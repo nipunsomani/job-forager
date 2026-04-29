@@ -6,7 +6,7 @@ This repo is the active implementation repo for `job-forager`.
 
 **Goal**: Build the best free, open-source job hunting automation tool by evolving the original `job-forager` in small, safe phases.
 
-**Current Status**: Phase 1.x — Ingestion Foundation. 10 live job collectors, 214 tests passing, zero external dependencies.
+**Current Status**: Phase 1.x - Ingestion Foundation. 10 live job collectors, 214 tests passing, zero external dependencies.
 
 ## Repository Structure
 
@@ -115,9 +115,9 @@ Ask for approval before crossing phase boundaries.
 
 ## Documentation references
 
-- `README.md` — Project overview, quick start, features
-- `dev-docs/architecture.md` — Module structure and data flow
-- `docs/CLI_REFERENCE.md` — All CLI commands and flags
-- `docs/API_SOURCES.md` — Collector API documentation
-- `docs/ROADMAP.md` — Future improvements and extensions
-- `dev-docs/safety-policy.md` — Safety constraints
+- `README.md` - Project overview, quick start, features
+- `dev-docs/architecture.md` - Module structure and data flow
+- `docs/CLI_REFERENCE.md` - All CLI commands and flags
+- `docs/API_SOURCES.md` - Collector API documentation
+- `docs/ROADMAP.md` - Future improvements and extensions
+- `dev-docs/safety-policy.md` - Safety constraints
