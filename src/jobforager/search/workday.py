@@ -176,6 +176,9 @@ def _fetch_workday_company(
         bullet_fields = job.get("bulletFields", []) or []
         job_id = bullet_fields[0] if bullet_fields else ""
         location = bullet_fields[1] if len(bullet_fields) > 1 else ""
+        if not location:
+            # Some Workday configs put location in locationsText instead of bulletFields
+            location = job.get("locationsText", "") or ""
 
         external_path = job.get("externalPath", "")
         job_url = None
