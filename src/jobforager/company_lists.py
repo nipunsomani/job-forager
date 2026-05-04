@@ -50,6 +50,11 @@ _DEFAULT_WORKDAY_COMPANIES = [
     {"name": "Brevan Howard", "url": "https://wd3.myworkdaysite.com/recruiting/brevanhoward/BH_ExternalCareers"},
 ]
 
+_DEFAULT_PERSONIO_SUBDOMAINS = [
+    "personio", "pitch", "celonis", "spendesk", "solarisbank",
+    "ottonova", "traderepublic", "aboutyou", "lush", "westwing",
+]
+
 _HEADERS = {
     "User-Agent": "Mozilla/5.0 (compatible; jobforager/1.0)",
     "Accept": "application/json,text/csv",
@@ -293,6 +298,40 @@ def get_workday_companies() -> list[dict[str, str]]:
     if fetched is not None:
         merged = _merge_workday_lists(base, fetched)
         _save_local_workday(local_path, merged)
+        return merged
+
+    return base
+
+
+def get_personio_subdomains() -> list[str]:
+    """Load Personio subdomains from local JSON and external sources."""
+    local_path = _DATA_DIR / "personio_companies.json"
+    local_data = _load_local_json(local_path)
+
+    defaults = _DEFAULT_PERSONIO_SUBDOMAINS
+    base = _merge_string_lists(defaults, local_data or [])
+
+    # Try fetching from stapply-ai CSV
+    fetched = None
+    try:
+        rows = _fetch_csv(f"{_STAPPLY_BASE}/personio/personio_companies.csv")
+        slugs: list[str] = []
+        for row in rows:
+            subdomain = row.get("subdomain", "").strip() or row.get("url", "").strip()
+            if subdomain:
+                # Extract subdomain from URL if needed
+                if ".jobs.personio" in subdomain:
+                    subdomain = subdomain.split(".")[0]
+                if subdomain:
+                    slugs.append(subdomain)
+        if slugs:
+            fetched = slugs
+    except Exception:
+        pass
+
+    if fetched is not None:
+        merged = _merge_string_lists(base, fetched)
+        _save_local_json(local_path, merged)
         return merged
 
     return base

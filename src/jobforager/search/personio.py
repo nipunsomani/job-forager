@@ -18,9 +18,9 @@ _DEFAULT_HEADERS = {
     "Accept": "application/xml",
 }
 
-_DEFAULT_SUBDOMAINS = [
-    "personio",
-]
+from jobforager.company_lists import get_personio_subdomains
+
+_DEFAULT_SUBDOMAINS = get_personio_subdomains()
 
 _PERSONIO_FEED_URL = "https://{subdomain}.jobs.personio.de/xml"
 
