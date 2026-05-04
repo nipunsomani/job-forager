@@ -1,6 +1,6 @@
 # AGENTS.md - Job Forager
 
-Python 3.10+ CLI that aggregates live job listings from **17 sources** covering thousands of companies across every major ATS platform. One dependency (`python-jobspy`) required for LinkedIn, Indeed, and Glassdoor scraping; all other 14 sources use stdlib only.
+Python 3.10+ CLI that aggregates live job listings from **18 sources** covering thousands of companies across every major ATS platform. One dependency (`python-jobspy`) required for LinkedIn, Indeed, and Glassdoor scraping; all other 15 sources use stdlib only.
 
 ## Project Tenets
 
@@ -83,14 +83,15 @@ PYTHONPATH=src python -m unittest tests.test_search_remotive -v
 | 12 | **Adzuna** | API | Aggregator | Free API key |
 | 13 | **Pinpoint** | API | 76+ subdomains | No |
 | 14 | **Two Sigma** | RSS (Avature) | 1 company | No |
-| 15 | **LinkedIn** | Scraping | Aggregator | `python-jobspy` |
-| 16 | **Indeed** | Scraping | Aggregator | `python-jobspy` |
-| 17 | **Glassdoor** | Scraping | Aggregator | `python-jobspy` (broken upstream) |
+| 15 | **Personio** | XML Feed | Per-company subdomain | No |
+| 16 | **LinkedIn** | Scraping | Aggregator | `python-jobspy` |
+| 17 | **Indeed** | Scraping | Aggregator | `python-jobspy` |
+| 18 | **Glassdoor** | Scraping | Aggregator | `python-jobspy` (broken upstream) |
 
 ## Commands and gotchas
 
 - `hunt` only supports `--dry-run` (Phase 1.2 scaffolding).
-- `search` hits live APIs. Default sources: `remotive,hackernews`. Use `--sources all` for all 17.
+- `search` hits live APIs. Default sources: `remotive,hackernews`. Use `--sources all` for all 18.
 - `search --workers 30` is the default concurrency level for multi-company sources.
 - `search --since-last-run` outputs only jobs discovered since the previous run (uses SQLite DB at `~/.cache/jobforager/jobs.db` or custom `--db-path`).
 - Workday is slow (5-10+ min full scan) but enabled in CI.
