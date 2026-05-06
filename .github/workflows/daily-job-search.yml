@@ -40,9 +40,27 @@ jobs:
             --since-last-run \
             --output-json new_jobs.json
 
+      - name: Run full job search (all jobs)
+        env:
+          PYTHONPATH: src
+        run: |
+          python -m jobforager.cli search \
+            --sources all \
+            --title-keywords "Application Security,Application Security Engineer,Security,Security Engineer,Pentest,Penetration Test,Penetration Tester,Penetration Testing Engineer,Offensive Security,Offensive Security Engineer,Offsec,Offsec Engineer,Product Security,Product Security Engineer" \
+            --location "UK, London, remote" \
+            --last 1d \
+            --output-json all_jobs.json
+
       - name: Upload new jobs
         uses: actions/upload-artifact@v4
         with:
           name: new-jobs-${{ github.run_id }}
           path: new_jobs.json
+          retention-days: 7
+
+      - name: Upload all jobs
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-jobs-${{ github.run_id }}
+          path: all_jobs.json
           retention-days: 7
