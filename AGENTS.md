@@ -51,7 +51,7 @@ PYTHONPATH=src python -m unittest tests.test_search_remotive -v
 ## Architecture
 
 - `src/jobforager/cli/` - Entrypoint (`__main__.py`), parser, commands, pipeline orchestration.
-- `src/jobforager/search/` - One module per live source: remotive, hackernews, remoteok, arbeitnow, greenhouse, lever, ashby, smartrecruiters, workday, hiringcafe, weworkremotely, adzuna, pinpoint, twosigma, plus `jobspy_source` (LinkedIn, Indeed, Glassdoor).
+- `src/jobforager/search/` - One module per live source: remotive, hackernews, remoteok, arbeitnow, greenhouse, lever, ashby, smartrecruiters, workday, hiringcafe, weworkremotely, adzuna, pinpoint, twosigma, personio, plus `jobspy_source` (LinkedIn, Indeed, Glassdoor).
 - `src/jobforager/normalize/` - Normalization, deduplication, filtering, ATS detection, experience-level extraction, recruiter detection.
 - `src/jobforager/models/` - `JobRecord` and `CandidateProfile` dataclasses.
 - `src/jobforager/collectors/` - `CollectorRegistry` (sequential + `ThreadPoolExecutor` concurrent collection).
@@ -95,6 +95,7 @@ PYTHONPATH=src python -m unittest tests.test_search_remotive -v
 - `search --workers 30` is the default concurrency level for multi-company sources.
 - `search --since-last-run` outputs only jobs discovered since the previous run (uses SQLite DB at `~/.cache/jobforager/jobs.db` or custom `--db-path`).
 - Workday is slow (5-10+ min full scan) but enabled in CI.
+- Personio is slow (10-15+ min full scan of 4,000+ subdomains) but enabled in CI. Progress is logged every 100 subdomains.
 - Company lists are fetched dynamically from public GitHub repos on every run (no local cache).
 - Profile path defaults to `config/profile.example.toml` for `hunt`/`validate`; `search` has no default profile.
 - JobSpy sources (`linkedin`, `indeed`) require `pip install python-jobspy`. Glassdoor is broken upstream.

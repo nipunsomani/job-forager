@@ -86,12 +86,14 @@ python -m jobforager.cli search \
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--sources` | `remotive,hackernews` | Comma-separated source list. Available: `remotive`, `hackernews`, `remoteok`, `arbeitnow`, `greenhouse`, `lever`, `ashby`, `workday`, `smartrecruiters`, `hiringcafe`, `linkedin`, `indeed`, `glassdoor` |
+| `--sources` | `remotive,hackernews` | Comma-separated source list. Available: `remotive`, `hackernews`, `remoteok`, `arbeitnow`, `greenhouse`, `lever`, `ashby`, `smartrecruiters`, `workday`, `hiringcafe`, `weworkremotely`, `adzuna`, `pinpoint`, `twosigma`, `personio`, `linkedin`, `indeed`, `glassdoor` |
 | `--keywords` | (none) | Comma-separated keywords to match in title, company, tags, or description |
 | `--exclude` | (none) | Comma-separated keywords to EXCLUDE from results |
 | `--location` | (none) | Free-text location filter (substring match) |
 | `--level` | (none) | Filter by experience level: `intern`, `entry`, `mid`, `senior` |
 | `--hide-recruiters` | (none) | Hide jobs from staffing agencies and recruiting firms |
+| `--title-keywords` | (none) | Comma-separated keywords to match ONLY in job titles |
+| `--desc-keywords` | (none) | Comma-separated keywords to match ONLY in job descriptions |
 | `--since` | (none) | Only show jobs posted on or after this date (`YYYY-MM-DD`) |
 | `--last` | (none) | Duration window: `24h`, `7d`, `30d` |
 | `--workers` | `30` | Concurrent threads for multi-endpoint sources |
@@ -111,6 +113,11 @@ python -m jobforager.cli search \
 - **`hiringcafe`**: 2.1M+ job index, 1,000 jobs per page, **all pages fetched**. Falls back through urllib → curl_cffi → Playwright for Cloudflare bypass.
 - **`remotive`, `remoteok`, `arbeitnow`**: Single API call, all jobs returned.
 - **`hackernews`**: Top 50 comments from current month's thread.
+- **`weworkremotely`**: RSS feed, single fetch, all jobs returned.
+- **`adzuna`**: API aggregator, requires free developer key (`ADZUNA_APP_ID` + `ADZUNA_APP_KEY`). Silently skips if keys not set.
+- **`pinpoint`**: **76+ subdomains**, all jobs per subdomain, concurrent fetching.
+- **`twosigma`**: RSS feed (Avature), single fetch, up to 20 jobs.
+- **`personio`**: **4,000+ subdomains**, XML feed per subdomain, concurrent fetching. Slowest source (10-15 min full scan). Progress logged every 100 subdomains.
 - **`linkedin`, `indeed`, `glassdoor`**: Scraped via **JobSpy** (optional dependency). Install with `pip install python-jobspy`. Results capped at 50 per site by default (last 7 days). `--keywords` and `--title-keywords` are forwarded to the scraper as the search term.
 
 ### Example: Search All Sources
@@ -287,9 +294,11 @@ Set `PYTHONPATH=src` before running, or install the package with `pip install -e
 
 ### Workday search is very slow
 
-Workday requires fetching a CSRF token per company, then making paginated POST requests. Consider:
-- Using `--max_results_per_company` if calling programmatically
-- Using other sources for bulk discovery, Workday only for specific companies
+Workday requires fetching a CSRF token per company, then making paginated POST requests. Consider using other sources for bulk discovery and Workday only for specific companies.
+
+### Personio search is very slow
+
+Personio fetches XML feeds from 4,000+ subdomains concurrently. Full scan takes 10-15 minutes. Progress is logged every 100 subdomains. Use `--workers` to adjust concurrency.
 
 ### SSL certificate errors
 

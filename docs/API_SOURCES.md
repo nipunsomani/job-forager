@@ -15,6 +15,11 @@ This document describes every job source collector in detail: the API endpoint, 
 | **Ashby** | **All 2,796 board names** | None - single GET per board | All jobs per board |
 | **Workday** | **All companies** (live list) | 20 jobs per page, **all pages** | Up to 2,000 per company (API hard limit) |
 | **SmartRecruiters** | **All slugs** (live list) | 100 jobs per page, **all pages** | All jobs per slug |
+| **WeWorkRemotely** | 1 RSS feed | None - single request | All available (~50) |
+| **Adzuna** | 1 API query | None - single request | Up to 50 per query |
+| **Pinpoint** | **All 76+ subdomains** | None - single GET per subdomain | All jobs per subdomain |
+| **Two Sigma** | 1 RSS feed | None - single request | Up to 20 per fetch |
+| **Personio** | **All 4,000+ subdomains** | None - single XML per subdomain | All jobs per subdomain |
 | **Hiring.cafe** | 1 API query | 1,000 jobs per page, **all pages** | All matching jobs |
 | **LinkedIn** | JobSpy scraper | Page-scrolled scraping | Up to 50 per query (configurable) |
 | **Indeed** | JobSpy scraper | Page-scrolled scraping | Up to 50 per query (configurable) |
@@ -515,7 +520,7 @@ POST https://{company}.wd5.myworkdayjobs.com/wday/cxs/{company}/{site_name}/jobs
 | `postedOn` | `posted_at` | Human-readable string (e.g., "Posted Today") |
 
 ### Coverage
-- **Endpoints**: All companies from live list (currently 2: Accenture, NVIDIA)
+- **Endpoints**: All companies from live list (2,836+ companies)
 - **Pagination**: 20 jobs per page, **all pages fetched** until exhausted
 - **Jobs fetched**: All pages per company (up to 2,000 - Workday API hard limit)
 
@@ -582,7 +587,7 @@ https://jobs.smartrecruiters.com/{company_slug}/{job_id}
 - 404 on first page = company slug not found
 
 ### Coverage
-- **Endpoints**: All slugs from live list (currently 5: adobe1, canva, deloitte6, experian, samsung1)
+- **Endpoints**: All slugs from live list (812+ companies)
 - **Pagination**: 100 jobs per page, **all pages fetched** per slug
 - **Jobs fetched**: All jobs from every slug
 
@@ -690,6 +695,233 @@ None. No API key required.
 
 ---
 
+## WeWorkRemotely
+
+**Module**: `search/weworkremotely.py`  
+**Function**: `collect_weworkremotely_jobs()`
+
+### Endpoint
+```
+GET https://weworkremotely.com/remote-jobs/rss
+```
+
+### Authentication
+None.
+
+### Response Format
+RSS feed with job entries:
+```xml
+<item>
+  <title>Senior Engineer at Example Co</title>
+  <link>https://weworkremotely.com/remote-jobs/example-co-senior-engineer</link>
+  <description>Job description...</description>
+  <pubDate>Mon, 15 Jan 2024 09:00:00 GMT</pubDate>
+  <category>Programming</category>
+</item>
+```
+
+### Coverage
+- **Endpoints**: 1 RSS feed
+- **Pagination**: None - single request
+- **Jobs fetched**: All available (typically ~50)
+
+### Notes
+- HTML descriptions stripped to plain text
+- All jobs are remote by definition
+- URL validation is skipped for this source (RSS links redirect)
+
+---
+
+## Adzuna
+
+**Module**: `search/adzuna.py`  
+**Function**: `collect_adzuna_jobs(search_term, location, results_wanted)`
+
+### Endpoint
+```
+GET https://api.adzuna.com/v1/api/jobs/{country}/search/1
+```
+
+### Authentication
+Free developer API key required:
+- `ADZUNA_APP_ID` - your app ID
+- `ADZUNA_APP_KEY` - your app key
+
+Sign up at `developer.adzuna.com`.
+
+### Parameters
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `app_id` | (env) | From `ADZUNA_APP_ID` |
+| `app_key` | (env) | From `ADZUNA_APP_KEY` |
+| `what` | (from `--keywords`) | Search term |
+| `where` | (from `--location`) | Location filter |
+| `results_per_page` | `50` | Max results per query |
+
+### Response Format
+```json
+{
+  "results": [
+    {
+      "title": "Software Engineer",
+      "company": {"display_name": "Example Co"},
+      "location": {"display_name": "London, UK"},
+      "redirect_url": "https://www.adzuna.co.uk/jobs/...",
+      "description": "Job description...",
+      "category": {"tag": "it-jobs"},
+      "created": "2024-01-15T09:00:00Z",
+      "salary_min": 80000,
+      "salary_max": 120000,
+      "salary_currency": "GBP"
+    }
+  ]
+}
+```
+
+### Coverage
+- **Endpoints**: 1 API query per search
+- **Pagination**: None - single request (up to 50 results)
+- **Jobs fetched**: Up to 50 per query
+
+### Notes
+- **Silently skips** if `ADZUNA_APP_ID` or `ADZUNA_APP_KEY` not set
+- Country code auto-detected from location query (defaults to `gb`)
+- Salary data included when available
+
+---
+
+## Pinpoint
+
+**Module**: `search/pinpoint.py`  
+**Function**: `collect_pinpoint_jobs(search_term, location, max_workers)`
+
+### Endpoint
+```
+GET https://{subdomain}.pinpointhq.com/postings.json
+```
+
+### Authentication
+None. Public API.
+
+### Response Format
+```json
+[
+  {
+    "id": "abc-123",
+    "title": "Software Engineer",
+    "url": "https://example.pinpointhq.com/postings/abc-123",
+    "location": "Remote",
+    "department": "Engineering",
+    "employment_type": "Full-time",
+    "published_at": "2024-01-15T09:00:00Z",
+    "description": "Job description..."
+  }
+]
+```
+
+### Coverage
+- **Endpoints**: **All 76+ subdomains** explored concurrently (30 workers)
+- **Pagination**: None - single GET per subdomain returns all jobs
+- **Jobs fetched**: All jobs from every subdomain
+
+### Notes
+- Subdomains discovered from public GitHub repos on every run
+- Location and search term applied client-side after fetch
+
+---
+
+## Two Sigma
+
+**Module**: `search/twosigma.py`  
+**Function**: `collect_twosigma_jobs()`
+
+### Endpoint
+```
+GET https://careers.twosigma.com/careers/SearchJobs/rss
+```
+
+### Authentication
+None.
+
+### Response Format
+RSS feed (Avature-powered):
+```xml
+<item>
+  <title>Software Engineer</title>
+  <link>https://careers.twosigma.com/careers/JobDetail?jobId=...</link>
+  <description>Job description...</description>
+  <pubDate>Mon, 15 Jan 2024 09:00:00 GMT</pubDate>
+  <category>Engineering</category>
+</item>
+```
+
+### Coverage
+- **Endpoints**: 1 RSS feed
+- **Pagination**: None - single request
+- **Jobs fetched**: Up to 20 per fetch
+
+### Notes
+- Avature RSS feed (same ATS as some other quant finance firms)
+- HTML descriptions stripped to plain text
+- Single company source (Two Sigma only)
+
+---
+
+## Personio
+
+**Module**: `search/personio.py`  
+**Function**: `collect_personio_jobs(subdomains, max_workers)`
+
+### Endpoint
+```
+GET https://{subdomain}.jobs.personio.de/xml
+```
+
+### Authentication
+None. Public XML feed.
+
+### Response Format
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<workzag-jobs>
+  <position>
+    <id>123</id>
+    <subcompany>Example Co</subcompany>
+    <office>Berlin</office>
+    <department>Engineering</department>
+    <name>Senior Engineer</name>
+    <jobDescriptions>
+      <jobDescription>
+        <name>About the role</name>
+        <value><![CDATA[Build great products.]]></value>
+      </jobDescription>
+    </jobDescriptions>
+    <employmentType>permanent</employmentType>
+    <seniority>experienced</seniority>
+    <schedule>full-time</schedule>
+    <createdAt>2024-01-15T10:00:00+00:00</createdAt>
+  </position>
+</workzag-jobs>
+```
+
+### Coverage
+- **Endpoints**: **All 4,000+ subdomains** explored concurrently (30 workers)
+- **Pagination**: None - single XML per subdomain
+- **Jobs fetched**: All jobs from every subdomain
+
+### Company Lists
+- Defaults: 10 curated subdomains (pitch, celonis, spendesk, etc.)
+- Fetches **4,000+ subdomains** live from stapply-ai/ats-scrapers CSV on every run
+- Merges external data into local JSON (`data/personio_companies.json`)
+
+### Notes
+- No bot protection, no rate limiting observed
+- XML feeds include full job descriptions
+- Progress logged every 100 subdomains
+- Full scan takes 10-15 minutes
+
+---
+
 ## LinkedIn (via JobSpy)
 
 **Module**: `search/jobspy_source.py`  
@@ -793,6 +1025,11 @@ Same interface as LinkedIn above.
 | **Ashby** | **Parallel** (ThreadPoolExecutor) | None | **30** |
 | **Workday** | **Parallel** (ThreadPoolExecutor) | 0.5s | **10** |
 | **SmartRecruiters** | **Parallel** (ThreadPoolExecutor) | None | **10** |
+| **Pinpoint** | **Parallel** (ThreadPoolExecutor) | None | **30** |
+| **Personio** | **Parallel** (ThreadPoolExecutor) | None | **30** |
+| WeWorkRemotely | Single call | None | N/A |
+| Adzuna | Single call | None | N/A |
+| Two Sigma | Single call | None | N/A |
 | Hiring.cafe | Sequential pages | None | N/A |
 | LinkedIn | Internal (JobSpy) | None | N/A |
 | Indeed | Internal (JobSpy) | None | N/A |
@@ -800,7 +1037,7 @@ Same interface as LinkedIn above.
 
 ### General Guidelines
 - **No artificial limits**: All multi-endpoint sources explore every available company/board/slug
-- **Concurrent fetching**: Greenhouse, Lever, Ashby, Workday, and SmartRecruiters use `ThreadPoolExecutor` for parallel requests
+- **Concurrent fetching**: Greenhouse, Lever, Ashby, Workday, SmartRecruiters, Pinpoint, and Personio use `ThreadPoolExecutor` for parallel requests
 - **CLI `--workers` flag**: Controls concurrency for multi-company sources (default: 30)
 - All collectors gracefully handle network errors and return `[]`
 - Company lists are fetched live from GitHub on every run (no caching)

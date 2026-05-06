@@ -7,7 +7,7 @@
   <p>
     <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10+-blue.svg" alt="Python 3.10+"></a>
     <img src="https://img.shields.io/badge/Sources-18-green.svg" alt="18 Sources">
-    <img src="https://img.shields.io/badge/Tests-322-brightgreen.svg" alt="322 Tests">
+    <img src="https://img.shields.io/badge/Tests-327-brightgreen.svg" alt="327 Tests">
     <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
   </p>
 </div>

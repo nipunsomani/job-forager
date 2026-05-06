@@ -119,7 +119,8 @@ def build_parser() -> argparse.ArgumentParser:
             "Comma-separated source list. Available: remotive, hackernews, "
             "remoteok, arbeitnow, greenhouse, lever, ashby, smartrecruiters, "
             "workday, hiringcafe, linkedin, indeed, glassdoor, "
-            "weworkremotely. (default: remotive,hackernews)."
+            "weworkremotely, adzuna, pinpoint, twosigma, personio. "
+            "(default: remotive,hackernews)."
         ),
     )
     search_parser.add_argument(
@@ -180,7 +181,8 @@ def build_parser() -> argparse.ArgumentParser:
             "Comma-separated source list or 'all'. Available: remotive, hackernews, "
             "remoteok, arbeitnow, greenhouse, lever, ashby, smartrecruiters, "
             "workday, hiringcafe, linkedin, indeed, glassdoor, "
-            "weworkremotely. (default: all)."
+            "weworkremotely, adzuna, pinpoint, twosigma, personio. "
+            "(default: all)."
         ),
     )
     health_parser.add_argument(

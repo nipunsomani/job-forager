@@ -6,11 +6,14 @@ public, unauthenticated XML feed endpoint.
 
 from __future__ import annotations
 
+import logging
 import ssl
 import urllib.request
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any
+
+logger = logging.getLogger("jobforager.search.personio")
 
 
 _DEFAULT_HEADERS = {
@@ -182,25 +185,39 @@ def collect_personio_jobs(
         List of raw job record dictionaries.
     """
     targets = subdomains if subdomains is not None else _DEFAULT_SUBDOMAINS
+    total = len(targets)
 
     if max_workers <= 1:
         all_results: list[dict[str, Any]] = []
-        for subdomain in targets:
+        for idx, subdomain in enumerate(targets, start=1):
             jobs = _fetch_personio_company(subdomain)
             all_results.extend(jobs)
+            if idx % 100 == 0 or idx == total:
+                logger.info(
+                    "personio progress: %d/%d subdomains (%d jobs, %d errors)",
+                    idx, total, len(all_results), 0,
+                )
         return all_results
 
     all_results: list[dict[str, Any]] = []
+    completed = 0
+    errors = 0
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = {
             executor.submit(_fetch_personio_company, subdomain): subdomain
             for subdomain in targets
         }
         for future in as_completed(futures):
+            completed += 1
             try:
                 jobs = future.result()
                 all_results.extend(jobs)
             except Exception:
-                pass
+                errors += 1
+            if completed % 100 == 0 or completed == total:
+                logger.info(
+                    "personio progress: %d/%d subdomains (%d jobs, %d errors)",
+                    completed, total, len(all_results), errors,
+                )
 
     return all_results
