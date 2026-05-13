@@ -1,4 +1,4 @@
-"""Generate a dual-view HTML job board from JSON files.
+"""Generate a polished dual-view HTML job board from JSON files.
 
 Usage:
     python scripts/gen_job_board.py <all_jobs.json> <new_jobs.json> [output.html]
@@ -48,7 +48,7 @@ def render_job(job: dict, idx: int) -> str:
     posted = esc((job.get("posted_at") or "")[:10])
     return (
         f'<div class="job-card" data-source="{esc(source)}">'
-        f'<div class="job-header">'
+        f'<div class="card-top">'
         f'<span class="source-badge" style="background:{color}">{esc(source)}</span>'
         f'<span class="posted">{posted}</span>'
         f'</div>'
@@ -93,38 +93,40 @@ def generate_html(all_jobs: list[dict], new_jobs: list[dict]) -> str:
 <title>Job Forager</title>
 <style>
 *{{margin:0;padding:0;box-sizing:border-box}}
-body{{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}}
-.header{{background:#1e293b;padding:16px 24px;position:sticky;top:0;z-index:100;border-bottom:1px solid #334155}}
-.header-top{{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}}
-.header h1{{font-size:22px;font-weight:700;letter-spacing:-0.5px}}
-.view-toggle{{display:flex;background:#0f172a;border-radius:8px;padding:3px;border:1px solid #334155}}
-.view-btn{{padding:8px 20px;border-radius:6px;border:none;background:transparent;color:#94a3b8;cursor:pointer;font-size:14px;font-weight:600;transition:all .2s}}
-.view-btn.active{{background:#3b82f6;color:#fff;box-shadow:0 2px 8px rgba(59,130,246,0.3)}}
-.view-btn:hover:not(.active){{color:#e2e8f0;background:#1e293b}}
-.view-btn .badge{{display:inline-block;min-width:20px;padding:1px 6px;border-radius:10px;font-size:11px;font-weight:700;margin-left:6px;background:rgba(255,255,255,0.15)}}
+body{{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#0a0f1a;color:#e2e8f0;min-height:100vh}}
+.header{{background:linear-gradient(180deg,#111827 0%,#0f172a 100%);padding:20px 28px;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(12px)}}
+.header-top{{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}}
+.header h1{{font-size:24px;font-weight:800;letter-spacing:-0.5px;background:linear-gradient(135deg,#60a5fa 0%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}}
+.view-toggle{{display:flex;background:rgba(255,255,255,0.03);border-radius:10px;padding:4px;border:1px solid rgba(255,255,255,0.08)}}
+.view-btn{{padding:10px 24px;border-radius:8px;border:none;background:transparent;color:#94a3b8;cursor:pointer;font-size:14px;font-weight:600;transition:all .25s cubic-bezier(.4,0,.2,1)}}
+.view-btn.active{{background:linear-gradient(135deg,#3b82f6 0%,#6366f1 100%);color:#fff;box-shadow:0 4px 16px rgba(59,130,246,0.3)}}
+.view-btn:hover:not(.active){{color:#e2e8f0;background:rgba(255,255,255,0.05)}}
+.view-btn .badge{{display:inline-block;min-width:22px;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;margin-left:8px;background:rgba(255,255,255,0.15)}}
 .view-btn.active .badge{{background:rgba(255,255,255,0.25)}}
-.tabs{{display:flex;gap:6px;flex-wrap:wrap}}
-.tab{{padding:6px 14px;border-radius:20px;border:1px solid #475569;background:#1e293b;color:#94a3b8;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}}
-.tab:hover{{background:#334155;color:#e2e8f0}}
-.tab.active{{background:#3b82f6;border-color:#3b82f6;color:#fff}}
-.grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;padding:16px 24px}}
-.job-card{{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:14px;transition:all .15s}}
-.job-card:hover{{border-color:#3b82f6;transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.3)}}
-.job-header{{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}}
-.source-badge{{padding:2px 10px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;text-transform:uppercase;letter-spacing:.5px}}
-.posted{{font-size:11px;color:#64748b}}
-.job-title{{font-size:15px;font-weight:600;color:#f1f5f9;margin-bottom:4px;line-height:1.3}}
-.job-company{{font-size:13px;color:#94a3b8;margin-bottom:2px}}
-.job-location{{font-size:12px;color:#64748b;margin-bottom:10px}}
-.job-actions{{display:flex;gap:8px}}
-.apply-btn{{display:inline-flex;align-items:center;padding:6px 16px;background:#3b82f6;color:#fff;border-radius:6px;font-size:13px;font-weight:500;text-decoration:none;transition:background .15s}}
-.apply-btn:hover{{background:#2563eb}}
-.view-link{{display:inline-flex;align-items:center;padding:6px 16px;background:#334155;color:#94a3b8;border-radius:6px;font-size:13px;font-weight:500;text-decoration:none;transition:all .15s}}
-.view-link:hover{{background:#475569;color:#e2e8f0}}
+.tabs{{display:flex;gap:8px;flex-wrap:wrap}}
+.tab{{padding:7px 16px;border-radius:24px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:#94a3b8;cursor:pointer;font-size:13px;font-weight:500;transition:all .2s cubic-bezier(.4,0,.2,1)}}
+.tab:hover{{background:rgba(255,255,255,0.08);color:#e2e8f0;border-color:rgba(255,255,255,0.12)}}
+.tab.active{{background:linear-gradient(135deg,#3b82f6 0%,#6366f1 100%);border-color:transparent;color:#fff;box-shadow:0 2px 8px rgba(59,130,246,0.25)}}
+.grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;padding:20px 28px}}
+.job-card{{background:linear-gradient(145deg,rgba(30,41,59,0.8) 0%,rgba(15,23,42,0.9) 100%);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:18px;transition:all .25s cubic-bezier(.4,0,.2,1)}}
+.job-card:hover{{border-color:rgba(99,102,241,0.4);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,0.4),0 0 0 1px rgba(99,102,241,0.1)}}
+.card-top{{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}}
+.source-badge{{padding:3px 12px;border-radius:14px;font-size:11px;font-weight:600;color:#fff;text-transform:uppercase;letter-spacing:0.5px}}
+.posted{{font-size:11px;color:#64748b;font-weight:500}}
+.job-title{{font-size:16px;font-weight:700;color:#f1f5f9;margin-bottom:6px;line-height:1.4}}
+.job-company{{font-size:14px;color:#94a3b8;margin-bottom:4px;font-weight:500}}
+.job-location{{font-size:12px;color:#64748b;margin-bottom:14px}}
+.job-actions{{display:flex;gap:10px}}
+.apply-btn{{display:inline-flex;align-items:center;padding:8px 20px;background:linear-gradient(135deg,#3b82f6 0%,#6366f1 100%);color:#fff;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;transition:all .2s cubic-bezier(.4,0,.2,1)}}
+.apply-btn:hover{{transform:translateY(-1px);box-shadow:0 4px 12px rgba(59,130,246,0.4)}}
+.view-link{{display:inline-flex;align-items:center;padding:8px 20px;background:rgba(255,255,255,0.05);color:#94a3b8;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;border:1px solid rgba(255,255,255,0.08);transition:all .2s cubic-bezier(.4,0,.2,1)}}
+.view-link:hover{{background:rgba(255,255,255,0.1);color:#e2e8f0;border-color:rgba(255,255,255,0.15)}}
 .hidden{{display:none!important}}
 @media(max-width:640px){{
-  .grid{{grid-template-columns:1fr;padding:12px}}
-  .header-top{{flex-direction:column;gap:12px}}
+  .grid{{grid-template-columns:1fr;padding:16px}}
+  .header-top{{flex-direction:column;gap:16px}}
+  .view-toggle{{width:100%}}
+  .view-btn{{flex:1;text-align:center}}
 }}
 </style>
 </head>
@@ -147,23 +149,19 @@ body{{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
 let currentView="all";
 let currentSource="all";
 
-// View toggle
 document.querySelectorAll(".view-btn").forEach(btn=>{{
   btn.addEventListener("click",()=>{{
     document.querySelectorAll(".view-btn").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
     currentView=btn.dataset.view;
     currentSource="all";
-    // Reset source tabs
     document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.source==="all"));
-    // Show/hide grids
     document.getElementById("grid-all").classList.toggle("hidden",currentView!=="all");
     document.getElementById("grid-new").classList.toggle("hidden",currentView!=="new");
     filterCards();
   }});
 }});
 
-// Source tabs
 document.querySelectorAll(".tab").forEach(tab=>{{
   tab.addEventListener("click",()=>{{
     document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
