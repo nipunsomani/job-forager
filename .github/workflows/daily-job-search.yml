@@ -52,17 +52,13 @@ jobs:
             --output-json all_jobs.json
 
       - name: Generate job board HTML
-        run: |
-          python scripts/gen_job_board.py all_jobs.json job_board.html
-          python scripts/gen_job_board.py new_jobs.json new_jobs.html
+        run: python scripts/gen_job_board.py all_jobs.json new_jobs.json job_board.html
 
       - name: Upload new jobs
         uses: actions/upload-artifact@v4
         with:
           name: new-jobs-${{ github.run_id }}
-          path: |
-            new_jobs.json
-            new_jobs.html
+          path: new_jobs.json
           retention-days: 7
 
       - name: Upload all jobs
